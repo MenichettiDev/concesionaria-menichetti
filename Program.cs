@@ -1,7 +1,17 @@
+using Microsoft.EntityFrameworkCore;
+using concesionaria_menichetti.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+
+//Agregar el contexto de la base de datos a la inyección de dependencias
+builder.Services.AddDbContext<ConcesionariaContext>(options =>
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        new MySqlServerVersion(new Version(8, 0, 34)) // Usá tu versión de MySQL
+    ));
 
 var app = builder.Build();
 

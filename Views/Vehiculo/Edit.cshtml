@@ -1,0 +1,31 @@
+@model TbVehiculo
+
+@{
+    ViewData["Title"] = "Editar Vehículo";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label for="Marca">Marca</label>
+        <input type="text" class="form-control" asp-for="Marca" required />
+    </div>
+    <div class="form-group">
+        <label for="Modelo">Modelo</label>
+        <input type="text" class="form-control" asp-for="Modelo" required />
+    </div>
+    <div class="form-group">
+        <label for="Año">Año</label>
+        <input type="number" class="form-control" asp-for="Año" required />
+    </div>
+    <div class="form-group">
+        <label for="Estado">Estado</label>
+        <select class="form-control" asp-for="Estado">
+            @* <option value="Activo" @if (Model.Estado == 0) { <text>selected</text> }>Activo</option>
+            <option value="Inactivo" @if (Model.Estado == 1) { <text>selected</text> }>Inactivo</option> *@
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

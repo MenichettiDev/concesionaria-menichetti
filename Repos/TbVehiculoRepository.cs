@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class TbVehiculoRepository : GenericRepository<TbVehiculo>, ITbVehiculoRepository
+public class TbVehiculoRepository : GenericRepository<TbVehiculo>
 {
     private readonly ConcesionariaContext _context;
 

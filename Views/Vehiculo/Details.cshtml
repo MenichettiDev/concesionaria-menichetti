@@ -1,0 +1,16 @@
+@model TbVehiculo
+
+@{
+    ViewData["Title"] = "Detalles del Vehículo";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div>
+    <h3>Marca: @Model.Marca</h3>
+    <h4>Modelo: @Model.Modelo</h4>
+    <p>Año: @Model.Año</p>
+    <p>Estado: @Model.Estado</p>
+</div>
+
+<a href="@Url.Action("Index", "Vehiculos")" class="btn btn-secondary">Volver al listado</a>

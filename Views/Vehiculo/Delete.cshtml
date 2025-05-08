@@ -1,0 +1,15 @@
+@model TbVehiculo
+
+@{
+    ViewData["Title"] = "Eliminar Vehículo";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<p>¿Estás seguro de que deseas eliminar el vehículo @Model.Marca @Model.Modelo?</p>
+
+<form asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a href="@Url.Action("Index", "Vehiculos")" class="btn btn-secondary">Cancelar</a>
+</form>

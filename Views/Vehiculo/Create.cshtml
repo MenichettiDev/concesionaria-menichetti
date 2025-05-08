@@ -1,0 +1,30 @@
+@model TbVehiculo
+
+@{
+    ViewData["Title"] = "Crear Vehículo";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form asp-action="Create" method="post">
+    <div class="form-group">
+        <label for="Marca">Marca</label>
+        <input type="text" class="form-control" id="Marca" name="Marca" required />
+    </div>
+    <div class="form-group">
+        <label for="Modelo">Modelo</label>
+        <input type="text" class="form-control" id="Modelo" name="Modelo" required />
+    </div>
+    <div class="form-group">
+        <label for="Año">Año</label>
+        <input type="number" class="form-control" id="Año" name="Año" required />
+    </div>
+    <div class="form-group">
+        <label for="Estado">Estado</label>
+        <select class="form-control" id="Estado" name="Estado">
+            <option value="Activo">Activo</option>
+            <option value="Inactivo">Inactivo</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Guardar</button>
+</form>

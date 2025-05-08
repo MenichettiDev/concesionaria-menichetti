@@ -1,0 +1,36 @@
+@model IEnumerable<TbVehiculo>  
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Vehículos Activos</title>
+</head>
+<body>
+    <h1>Vehículos Activos</h1>
+
+    <table border="1">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Año</th>
+                <th>Estado</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var vehiculo in Model)
+            {
+                <tr>
+                    <td>@vehiculo.Id</td>
+                    <td>@vehiculo.Marca</td>
+                    <td>@vehiculo.Modelo</td>
+                    <td>@vehiculo.Año</td>
+                    <td>@vehiculo.Estado</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</body>
+</html>

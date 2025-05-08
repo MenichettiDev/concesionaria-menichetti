@@ -6,6 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<ITbVehiculoRepository, TbVehiculoRepository>();
+builder.Services.AddScoped<VehiculoService>();
+
+
 //Agregar el contexto de la base de datos a la inyección de dependencias
 builder.Services.AddDbContext<ConcesionariaContext>(options =>
     options.UseMySql(

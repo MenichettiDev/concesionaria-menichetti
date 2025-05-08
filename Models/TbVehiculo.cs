@@ -21,11 +21,11 @@ public partial class TbVehiculo
 
     public string? Combustible { get; set; }
 
-    public string? Estado { get; set; }
-
     public bool? Destacado { get; set; }
 
     public DateTime? FechaDestacado { get; set; }
+
+    public int Estado { get; set; }
 
     public virtual ICollection<TbAccesosPagado> TbAccesosPagados { get; set; } = new List<TbAccesosPagado>();
 

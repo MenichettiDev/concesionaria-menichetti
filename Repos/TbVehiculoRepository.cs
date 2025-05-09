@@ -5,20 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class TbVehiculoRepository : GenericRepository<TbVehiculo>
+public class VehiculoRepository : GenericRepository<Vehiculo>
 {
     private readonly ConcesionariaContext _context;
 
-    public TbVehiculoRepository(ConcesionariaContext context) : base(context)
+    public VehiculoRepository(ConcesionariaContext context) : base(context)
     {
         _context = context;
     }
 
-    public async Task<IEnumerable<TbVehiculo>> GetVehiculosActivosAsync()
+    public async Task<IEnumerable<Vehiculo>> GetVehiculosActivosAsync()
     {
         try
         {
-            return await _context.TbVehiculos
+            return await _context.Vehiculos
                 .Where(v => v.Estado == 1)
                 .ToListAsync();
         }
@@ -27,4 +27,9 @@ public class TbVehiculoRepository : GenericRepository<TbVehiculo>
             throw new Exception("Error al obtener vehículos activos", ex);
         }
     }
+    public IQueryable<Vehiculo> GetQueryable()
+    {
+        return _context.Vehiculos.AsQueryable();
+    }
+
 }

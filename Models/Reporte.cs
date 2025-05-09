@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbReporte
+public partial class Reporte
 {
     public int Id { get; set; }
 
@@ -15,7 +15,7 @@ public partial class TbReporte
 
     public DateTime? Fecha { get; set; }
 
-    public virtual TbUsuario? Usuario { get; set; }
+    public virtual Usuario? Usuario { get; set; }
 
-    public virtual TbVehiculo? Vehiculo { get; set; }
+    public virtual Vehiculo? Vehiculo { get; set; }
 }

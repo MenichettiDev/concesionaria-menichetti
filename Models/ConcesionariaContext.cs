@@ -16,33 +16,33 @@ public partial class ConcesionariaContext : DbContext
     {
     }
 
-    public virtual DbSet<TbAccesosPagado> TbAccesosPagados { get; set; }
+    public virtual DbSet<AccesosPagado> AccesosPagados { get; set; }
 
-    public virtual DbSet<TbComentario> TbComentarios { get; set; }
+    public virtual DbSet<Comentario> Comentarios { get; set; }
 
-    public virtual DbSet<TbConcesionaria> TbConcesionarias { get; set; }
+    public virtual DbSet<Concesionaria> Concesionarias { get; set; }
 
-    public virtual DbSet<TbContratosPlane> TbContratosPlanes { get; set; }
+    public virtual DbSet<ContratosPlane> ContratosPlanes { get; set; }
 
-    public virtual DbSet<TbDestacado> TbDestacados { get; set; }
+    public virtual DbSet<Destacado> Destacados { get; set; }
 
-    public virtual DbSet<TbEmpleadosConcesionarium> TbEmpleadosConcesionaria { get; set; }
+    public virtual DbSet<EmpleadosConcesionarium> EmpleadosConcesionaria { get; set; }
 
-    public virtual DbSet<TbFavorito> TbFavoritos { get; set; }
+    public virtual DbSet<Favorito> Favoritos { get; set; }
 
-    public virtual DbSet<TbFotosVehiculo> TbFotosVehiculos { get; set; }
+    public virtual DbSet<FotosVehiculo> FotosVehiculos { get; set; }
 
-    public virtual DbSet<TbPago> TbPagos { get; set; }
+    public virtual DbSet<Pago> Pagos { get; set; }
 
-    public virtual DbSet<TbPlanesConcesionarium> TbPlanesConcesionaria { get; set; }
+    public virtual DbSet<PlanesConcesionarium> PlanesConcesionaria { get; set; }
 
-    public virtual DbSet<TbReporte> TbReportes { get; set; }
+    public virtual DbSet<Reporte> Reportes { get; set; }
 
-    public virtual DbSet<TbSuscripcione> TbSuscripciones { get; set; }
+    public virtual DbSet<Suscripcione> Suscripciones { get; set; }
 
-    public virtual DbSet<TbUsuario> TbUsuarios { get; set; }
+    public virtual DbSet<Usuario> Usuarios { get; set; }
 
-    public virtual DbSet<TbVehiculo> TbVehiculos { get; set; }
+    public virtual DbSet<Vehiculo> Vehiculos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -54,7 +54,7 @@ public partial class ConcesionariaContext : DbContext
             .UseCollation("utf8mb4_0900_ai_ci")
             .HasCharSet("utf8mb4");
 
-        modelBuilder.Entity<TbAccesosPagado>(entity =>
+        modelBuilder.Entity<AccesosPagado>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -72,16 +72,16 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
             entity.Property(e => e.VehiculoId).HasColumnName("vehiculoId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbAccesosPagados)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.AccesosPagados)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_accesos_pagados_ibfk_1");
 
-            entity.HasOne(d => d.Vehiculo).WithMany(p => p.TbAccesosPagados)
+            entity.HasOne(d => d.Vehiculo).WithMany(p => p.AccesosPagados)
                 .HasForeignKey(d => d.VehiculoId)
                 .HasConstraintName("tb_accesos_pagados_ibfk_2");
         });
 
-        modelBuilder.Entity<TbComentario>(entity =>
+        modelBuilder.Entity<Comentario>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -103,16 +103,16 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("texto");
             entity.Property(e => e.VendedorId).HasColumnName("vendedorId");
 
-            entity.HasOne(d => d.Comprador).WithMany(p => p.TbComentarioCompradors)
+            entity.HasOne(d => d.Comprador).WithMany(p => p.ComentarioCompradors)
                 .HasForeignKey(d => d.CompradorId)
                 .HasConstraintName("tb_comentarios_ibfk_1");
 
-            entity.HasOne(d => d.Vendedor).WithMany(p => p.TbComentarioVendedors)
+            entity.HasOne(d => d.Vendedor).WithMany(p => p.ComentarioVendedors)
                 .HasForeignKey(d => d.VendedorId)
                 .HasConstraintName("tb_comentarios_ibfk_2");
         });
 
-        modelBuilder.Entity<TbConcesionaria>(entity =>
+        modelBuilder.Entity<Concesionaria>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -132,12 +132,12 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("nombre");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbConcesionaria)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Concesionaria)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_concesionarias_ibfk_1");
         });
 
-        modelBuilder.Entity<TbContratosPlane>(entity =>
+        modelBuilder.Entity<ContratosPlane>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -156,16 +156,16 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.FechaInicio).HasColumnName("fechaInicio");
             entity.Property(e => e.PlanId).HasColumnName("planId");
 
-            entity.HasOne(d => d.Concesionaria).WithMany(p => p.TbContratosPlanes)
+            entity.HasOne(d => d.Concesionaria).WithMany(p => p.ContratosPlanes)
                 .HasForeignKey(d => d.ConcesionariaId)
                 .HasConstraintName("tb_contratos_planes_ibfk_1");
 
-            entity.HasOne(d => d.Plan).WithMany(p => p.TbContratosPlanes)
+            entity.HasOne(d => d.Plan).WithMany(p => p.ContratosPlanes)
                 .HasForeignKey(d => d.PlanId)
                 .HasConstraintName("tb_contratos_planes_ibfk_2");
         });
 
-        modelBuilder.Entity<TbDestacado>(entity =>
+        modelBuilder.Entity<Destacado>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -183,12 +183,12 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("fechaInicio");
             entity.Property(e => e.VehiculoId).HasColumnName("vehiculoId");
 
-            entity.HasOne(d => d.Vehiculo).WithMany(p => p.TbDestacados)
+            entity.HasOne(d => d.Vehiculo).WithMany(p => p.Destacados)
                 .HasForeignKey(d => d.VehiculoId)
                 .HasConstraintName("tb_destacados_ibfk_1");
         });
 
-        modelBuilder.Entity<TbEmpleadosConcesionarium>(entity =>
+        modelBuilder.Entity<EmpleadosConcesionarium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -202,16 +202,16 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.ConcesionariaId).HasColumnName("concesionariaId");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Concesionaria).WithMany(p => p.TbEmpleadosConcesionaria)
+            entity.HasOne(d => d.Concesionaria).WithMany(p => p.EmpleadosConcesionaria)
                 .HasForeignKey(d => d.ConcesionariaId)
                 .HasConstraintName("tb_empleados_concesionaria_ibfk_1");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbEmpleadosConcesionaria)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.EmpleadosConcesionaria)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_empleados_concesionaria_ibfk_2");
         });
 
-        modelBuilder.Entity<TbFavorito>(entity =>
+        modelBuilder.Entity<Favorito>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -225,16 +225,16 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
             entity.Property(e => e.VehiculoId).HasColumnName("vehiculoId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbFavoritos)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Favoritos)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_favoritos_ibfk_1");
 
-            entity.HasOne(d => d.Vehiculo).WithMany(p => p.TbFavoritos)
+            entity.HasOne(d => d.Vehiculo).WithMany(p => p.Favoritos)
                 .HasForeignKey(d => d.VehiculoId)
                 .HasConstraintName("tb_favoritos_ibfk_2");
         });
 
-        modelBuilder.Entity<TbFotosVehiculo>(entity =>
+        modelBuilder.Entity<FotosVehiculo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -255,13 +255,13 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("foto_archivo");
             entity.Property(e => e.VehiculoId).HasColumnName("vehiculoId");
 
-            entity.HasOne(d => d.Vehiculo).WithMany(p => p.TbFotosVehiculos)
+            entity.HasOne(d => d.Vehiculo).WithMany(p => p.FotosVehiculos)
                 .HasForeignKey(d => d.VehiculoId)
                 .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("tb_fotos_vehiculo_ibfk_1");
         });
 
-        modelBuilder.Entity<TbPago>(entity =>
+        modelBuilder.Entity<Pago>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -285,12 +285,12 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("tipo");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbPagos)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Pagos)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_pagos_ibfk_1");
         });
 
-        modelBuilder.Entity<TbPlanesConcesionarium>(entity =>
+        modelBuilder.Entity<PlanesConcesionarium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -309,7 +309,7 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("precio");
         });
 
-        modelBuilder.Entity<TbReporte>(entity =>
+        modelBuilder.Entity<Reporte>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -330,16 +330,16 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
             entity.Property(e => e.VehiculoId).HasColumnName("vehiculoId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbReportes)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Reportes)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_reportes_ibfk_1");
 
-            entity.HasOne(d => d.Vehiculo).WithMany(p => p.TbReportes)
+            entity.HasOne(d => d.Vehiculo).WithMany(p => p.Reportes)
                 .HasForeignKey(d => d.VehiculoId)
                 .HasConstraintName("tb_reportes_ibfk_2");
         });
 
-        modelBuilder.Entity<TbSuscripcione>(entity =>
+        modelBuilder.Entity<Suscripcione>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -353,12 +353,12 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.FechaInicio).HasColumnName("fechaInicio");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbSuscripciones)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Suscripciones)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_suscripciones_ibfk_1");
         });
 
-        modelBuilder.Entity<TbUsuario>(entity =>
+        modelBuilder.Entity<Usuario>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -396,7 +396,7 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("verificado");
         });
 
-        modelBuilder.Entity<TbVehiculo>(entity =>
+        modelBuilder.Entity<Vehiculo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
@@ -430,7 +430,7 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("precio");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.TbVehiculos)
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Vehiculo)
                 .HasForeignKey(d => d.UsuarioId)
                 .HasConstraintName("tb_vehiculos_ibfk_1");
         });

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbPlanesConcesionarium
+public partial class PlanesConcesionarium
 {
     public int Id { get; set; }
 
@@ -15,5 +15,5 @@ public partial class TbPlanesConcesionarium
 
     public int? CantidadPublicaciones { get; set; }
 
-    public virtual ICollection<TbContratosPlane> TbContratosPlanes { get; set; } = new List<TbContratosPlane>();
+    public virtual ICollection<ContratosPlane> ContratosPlanes { get; set; } = new List<ContratosPlane>();
 }

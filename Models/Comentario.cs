@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbComentario
+public partial class Comentario
 {
     public int Id { get; set; }
 
@@ -17,7 +17,7 @@ public partial class TbComentario
 
     public DateTime? Fecha { get; set; }
 
-    public virtual TbUsuario? Comprador { get; set; }
+    public virtual Usuario? Comprador { get; set; }
 
-    public virtual TbUsuario? Vendedor { get; set; }
+    public virtual Usuario? Vendedor { get; set; }
 }

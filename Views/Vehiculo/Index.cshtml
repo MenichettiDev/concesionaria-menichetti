@@ -1,46 +1,173 @@
-@model IEnumerable<TbVehiculo>  
+@model IEnumerable<Vehiculo>
 
 @if (TempData["SuccessMessage"] != null)
 {
-    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["SuccessMessage"]',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+                popup: 'rounded shadow'
+            }
+        });
+    </script>
 }
+
 @if (ViewBag.ErrorMessage != null)
 {
     <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
 }
 
+@{
+    ViewData["Title"] = "Vehículos Activos";
+    var rnd = new Random();
+}
 
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <title>Vehículos Activos</title>
-</head>
-<body>
-    <h1>Vehículos Activos</h1>
+<h1 class="mb-4"><i class="bi bi-car-front"></i> Vehículos Activos</h1>
 
-    <table border="1">
-        <thead>
+<p>
+    <a asp-action="Crear" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill"></i> Crear Nuevo Vehículo
+    </a>
+</p>
+
+<form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
+        <div class="col-md-3">
+            <label class="form-label">Marca</label>
+            <select name="marca" class="form-select">
+                <option value="">Todas</option>
+                @foreach (var marca in Model.Select(v => v.Marca).Distinct())
+                {
+                    <option value="@marca" selected="@(Context.Request.Query["marca"] == marca)">@marca</option>
+                }
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select name="estado" class="form-select">
+                <option value="1" selected="@(Context.Request.Query["estado"] == "1")">Activo</option>
+                <option value="0" selected="@(Context.Request.Query["estado"] == "0")">Inactivo</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Año</label>
+            <input type="number" name="ano" value="@Context.Request.Query["ano"]" class="form-control" />
+        </div>
+
+        <div class="col-md-3 d-flex align-items-end">
+            <button type="submit" class="btn btn-primary w-100">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
+        </div>
+    </div>
+</form>
+
+<table class="table table-bordered table-hover shadow-sm align-middle bg-white table-striped">
+
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Marca</th>
+            <th>Modelo</th>
+            <th>Año</th>
+            <th>Estado</th>
+            <th><i class="bi bi-gear-fill"></i> Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var vehiculo in Model)
+        {
             <tr>
-                <th>ID</th>
-                <th>Marca</th>
-                <th>Modelo</th>
-                <th>Año</th>
-                <th>Estado</th>
+                <td>@vehiculo.Id</td>
+                <td>@vehiculo.Marca</td>
+                <td>@vehiculo.Modelo</td>
+                <td>@vehiculo.Año</td>
+                <td>
+                    <span class="badge @(vehiculo.Estado == 1 ? "bg-success" : "bg-danger")">
+                        @(vehiculo.Estado == 1 ? "Activo" : "Inactivo")
+                    </span>
+                </td>
+                <td class="text-nowrap">
+                    <a asp-action="Detalles" asp-route-id="@vehiculo.Id" class="btn btn-outline-info btn-sm" title="Details">
+                        <i class="bi bi-info-circle-fill"></i>
+                    </a>
+                    <a asp-action="Editar" asp-route-id="@vehiculo.Id" class="btn btn-outline-warning btn-sm" title="Edit">
+                        <i class="bi bi-pencil-square"></i>
+                    </a>
+                    @if (vehiculo.Estado == 1)
+                    {
+                        <a asp-action="Desactivar" asp-route-id="@vehiculo.Id" class="btn btn-outline-danger btn-sm" title="Delete">
+                            <i class="bi bi-slash-circle"></i>
+                        </a>
+                    }
+                    else
+                    {
+                        <a asp-action="Activar" asp-route-id="@vehiculo.Id" class="btn btn-outline-success btn-sm" title="Activar">
+                            <i class="bi bi-arrow-repeat"></i>
+                        </a>
+                    }
+                </td>
             </tr>
-        </thead>
-        <tbody>
-            @foreach (var vehiculo in Model)
-            {
-                <tr>
-                    <td>@vehiculo.Id</td>
-                    <td>@vehiculo.Marca</td>
-                    <td>@vehiculo.Modelo</td>
-                    <td>@vehiculo.Año</td>
-                    <td>@vehiculo.Estado</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-</body>
-</html>
+        }
+    </tbody>
+</table>
+
+@* Paginación *@
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+    </div>
+    <div>
+        @if (ViewBag.PaginaActual > 1)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Index", new {
+                page = ViewBag.PaginaActual - 1,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                ano = Context.Request.Query["ano"]
+            })">
+                Anterior
+            </a>
+        }
+
+        @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Index", new {
+                page = ViewBag.PaginaActual + 1,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                ano = Context.Request.Query["ano"]
+            })">
+                Siguiente
+            </a>
+        }
+    </div>
+</div>
+
+<nav aria-label="Paginación de vehículos" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPaginas = ViewBag.TotalPaginas;
+            int paginaActual = ViewBag.PaginaActual;
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            var url = Url.Action("Index", new {
+                page = i,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                ano = Context.Request.Query["ano"]
+            });
+
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="@url">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

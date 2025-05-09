@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbDestacado
+public partial class Destacado
 {
     public int Id { get; set; }
 
@@ -13,5 +13,5 @@ public partial class TbDestacado
 
     public DateTime? FechaFin { get; set; }
 
-    public virtual TbVehiculo? Vehiculo { get; set; }
+    public virtual Vehiculo? Vehiculo { get; set; }
 }

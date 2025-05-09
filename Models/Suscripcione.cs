@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbSuscripcione
+public partial class Suscripcione
 {
     public int Id { get; set; }
 
@@ -15,5 +15,5 @@ public partial class TbSuscripcione
 
     public bool? Activa { get; set; }
 
-    public virtual TbUsuario? Usuario { get; set; }
+    public virtual Usuario? Usuario { get; set; }
 }

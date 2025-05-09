@@ -14,12 +14,20 @@ namespace InmobiliariaApp.Controllers
             _vehiculoService = vehiculoService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string marca, int? estado, int? ano, int page = 1)
         {
             try
             {
-                var vehiculosActivos = await _vehiculoService.ObtenerVehiculosActivosAsync();
-                return View(vehiculosActivos);
+                // Configuración de la cantidad de elementos por página
+                int pageSize = 10;
+
+                var result = await _vehiculoService.ObtenerVehiculosFiltradosAsync(marca, estado, ano, page, pageSize);
+
+                // Pasar los resultados y la información de paginación a la vista
+                ViewBag.PaginaActual = page;
+                ViewBag.TotalPaginas = result.TotalPaginas;
+
+                return View(result.Vehiculos);
             }
             catch (Exception ex)
             {
@@ -27,6 +35,7 @@ namespace InmobiliariaApp.Controllers
                 return View(); // Vista vacía con error
             }
         }
+
 
         public async Task<IActionResult> Details(int? id)
         {
@@ -52,7 +61,7 @@ namespace InmobiliariaApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(TbVehiculo vehiculo)
+        public async Task<IActionResult> Create(Vehiculo vehiculo)
         {
             try
             {
@@ -92,7 +101,7 @@ namespace InmobiliariaApp.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, TbVehiculo vehiculo)
+        public async Task<IActionResult> Edit(int id, Vehiculo vehiculo)
         {
             if (id != vehiculo.Id) return NotFound();
 

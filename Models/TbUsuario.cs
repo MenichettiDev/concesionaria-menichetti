@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbUsuario
+public partial class Usuario
 {
     public int Id { get; set; }
 
@@ -25,23 +25,23 @@ public partial class TbUsuario
 
     public bool? Activo { get; set; }
 
-    public virtual ICollection<TbAccesosPagado> TbAccesosPagados { get; set; } = new List<TbAccesosPagado>();
+    public virtual ICollection<AccesosPagado> AccesosPagados { get; set; } = new List<AccesosPagado>();
 
-    public virtual ICollection<TbComentario> TbComentarioCompradors { get; set; } = new List<TbComentario>();
+    public virtual ICollection<Comentario> ComentarioCompradors { get; set; } = new List<Comentario>();
 
-    public virtual ICollection<TbComentario> TbComentarioVendedors { get; set; } = new List<TbComentario>();
+    public virtual ICollection<Comentario> ComentarioVendedors { get; set; } = new List<Comentario>();
 
-    public virtual ICollection<TbConcesionaria> TbConcesionaria { get; set; } = new List<TbConcesionaria>();
+    public virtual ICollection<Concesionaria> Concesionaria { get; set; } = new List<Concesionaria>();
 
-    public virtual ICollection<TbEmpleadosConcesionarium> TbEmpleadosConcesionaria { get; set; } = new List<TbEmpleadosConcesionarium>();
+    public virtual ICollection<EmpleadosConcesionarium> EmpleadosConcesionaria { get; set; } = new List<EmpleadosConcesionarium>();
 
-    public virtual ICollection<TbFavorito> TbFavoritos { get; set; } = new List<TbFavorito>();
+    public virtual ICollection<Favorito> Favoritos { get; set; } = new List<Favorito>();
 
-    public virtual ICollection<TbPago> TbPagos { get; set; } = new List<TbPago>();
+    public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
 
-    public virtual ICollection<TbReporte> TbReportes { get; set; } = new List<TbReporte>();
+    public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();
 
-    public virtual ICollection<TbSuscripcione> TbSuscripciones { get; set; } = new List<TbSuscripcione>();
+    public virtual ICollection<Suscripcione> Suscripciones { get; set; } = new List<Suscripcione>();
 
-    public virtual ICollection<TbVehiculo> TbVehiculos { get; set; } = new List<TbVehiculo>();
+    public virtual ICollection<Vehiculo> Vehiculo { get; set; } = new List<Vehiculo>();
 }

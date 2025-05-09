@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace concesionaria_menichetti.Models;
 
-public partial class TbEmpleadosConcesionarium
+public partial class EmpleadosConcesionarium
 {
     public int Id { get; set; }
 
@@ -11,7 +11,7 @@ public partial class TbEmpleadosConcesionarium
 
     public int? UsuarioId { get; set; }
 
-    public virtual TbConcesionaria? Concesionaria { get; set; }
+    public virtual Concesionaria? Concesionaria { get; set; }
 
-    public virtual TbUsuario? Usuario { get; set; }
+    public virtual Usuario? Usuario { get; set; }
 }

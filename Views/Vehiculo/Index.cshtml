@@ -1,3 +1,4 @@
+@using System.Text.Json
 @model IEnumerable<Vehiculo>
 
 @if (TempData["SuccessMessage"] != null)
@@ -25,7 +26,7 @@
     var rnd = new Random();
 }
 
-<h1 class="mb-4"><i class="bi bi-car-front"></i> Vehículos Activos</h1>
+<h1 class="mb-4"><i class="bi bi-car-front"></i> Mis Vehículos Activos</h1>
 
 <p>
     <a asp-action="Crear" class="btn btn-success">
@@ -33,42 +34,66 @@
     </a>
 </p>
 
-<form method="get" class="mb-4 p-3 bg-light rounded shadow-sm">
+<div id="filtros" class="mb-4 p-3 bg-light rounded shadow-sm">
     <div class="row g-2">
         <div class="col-md-3">
             <label class="form-label">Marca</label>
-            <select name="marca" class="form-select">
-                <option value="">Todas</option>
-                @foreach (var marca in Model.Select(v => v.Marca).Distinct())
-                {
-                    <option value="@marca" selected="@(Context.Request.Query["marca"] == marca)">@marca</option>
-                }
-            </select>
+            <input type="text" v-model="marca" @@input="filtrarSugerencias" class="form-control" placeholder="Escribí una marca" autocomplete="off">
+            <ul v-if="sugerencias.length > 0" class="list-group position-absolute mt-1 shadow" style="z-index: 1000;">
+                <li 
+                    class="list-group-item list-group-item-action" 
+                    v-for="s in sugerencias" 
+                    @@click="seleccionarMarca(s)">
+                    {{ s }}
+                </li>
+            </ul>
+            </input>   
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Modelo</label>
+            <input type="text" v-model="modelo" @@input="filtrarSugerenciasModelo" class="form-control" placeholder="Escribí un modelo" autocomplete="off">
+            <ul v-if="sugerenciasModelo.length > 0" class="list-group position-absolute mt-1 shadow" style="z-index: 1000;">
+                <li 
+                    class="list-group-item list-group-item-action" 
+                    v-for="s in sugerenciasModelo" 
+                    @@click="seleccionarModelo(s)">
+                    {{ s }}
+                </li>
+            </ul>
+        </div>
+        
+        <div class="col-md-3">
+            <label class="form-label">Año desde</label>
+            <input type="number" v-model="anoDesde" class="form-control" placeholder="Ej: 2010" />
+        </div>
+
+        <div class="col-md-3">
+            <label class="form-label">Año hasta</label>
+            <input type="number" v-model="anoHasta" class="form-control" placeholder="Ej: 2023" />
         </div>
 
         <div class="col-md-3">
             <label class="form-label">Estado</label>
-            <select name="estado" class="form-select">
-                <option value="1" selected="@(Context.Request.Query["estado"] == "1")">Activo</option>
-                <option value="0" selected="@(Context.Request.Query["estado"] == "0")">Inactivo</option>
+            <select v-model="estado" class="form-select">
+                <option value="1">Activo</option>
+                <option value="0">Inactivo</option>
             </select>
         </div>
 
-        <div class="col-md-3">
-            <label class="form-label">Año</label>
-            <input type="number" name="ano" value="@Context.Request.Query["ano"]" class="form-control" />
-        </div>
 
-        <div class="col-md-3 d-flex align-items-end">
-            <button type="submit" class="btn btn-primary w-100">
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button @@click="filtrar" class="btn btn-primary w-50" type="button">
                 <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
+            <button @@click="limpiarFiltros" class="btn btn-secondary w-50" type="button">
+                <i class="bi bi-x-circle"></i> Limpiar Filtros
             </button>
         </div>
     </div>
-</form>
+</div>
 
 <table class="table table-bordered table-hover shadow-sm align-middle bg-white table-striped">
-
     <thead class="table-dark">
         <tr>
             <th>ID</th>
@@ -117,7 +142,6 @@
     </tbody>
 </table>
 
-@* Paginación *@
 <div class="d-flex justify-content-between mb-3">
     <div>
         Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
@@ -162,7 +186,8 @@
                 page = i,
                 marca = Context.Request.Query["marca"],
                 estado = Context.Request.Query["estado"],
-                ano = Context.Request.Query["ano"]
+                anoDesde = Context.Request.Query["anoDesde"],
+                anoHasta = Context.Request.Query["anoHasta"]
             });
 
             <li class="page-item @(i == paginaActual ? "active" : "")">
@@ -171,3 +196,65 @@
         }
     </ul>
 </nav>
+
+@section Scripts {
+    <script>
+        new Vue({
+            el: '#filtros',
+            data: {
+                marca: '@Context.Request.Query["marca"]',
+                modelo: '@Context.Request.Query["modelo"]',
+                anoDesde: '@Context.Request.Query["anoDesde"]',
+                anoHasta: '@Context.Request.Query["anoHasta"]',
+                estado: '@Context.Request.Query["estado"]',
+                modelos: @Html.Raw(JsonSerializer.Serialize(Model.Select(v => v.Modelo).Distinct())),
+                marcas: @Html.Raw(JsonSerializer.Serialize(Model.Select(v => v.Marca).Distinct())),
+                sugerencias: [],
+                sugerenciasModelo: []
+            },
+
+            methods: {
+                filtrarSugerencias() {
+                    if (this.marca.length < 3) {
+                        this.sugerencias = [];
+                        return;
+                    }
+                    const texto = this.marca.toLowerCase();
+                    this.sugerencias = this.marcas.filter(m => m.toLowerCase().includes(texto));
+                },
+                seleccionarMarca(marcaSeleccionada) {
+                    this.marca = marcaSeleccionada;
+                    this.sugerencias = [];
+                },
+                filtrar() {
+                    const params = new URLSearchParams();
+                    if (this.marca) params.append("marca", this.marca);
+                    if (this.estado) params.append("estado", this.estado);
+                    if (this.anoDesde) params.append("anoDesde", this.anoDesde);
+                    if (this.anoHasta) params.append("anoHasta", this.anoHasta);
+                    if (this.modelo) params.append("modelo", this.modelo);
+                    window.location.href = "/Vehiculo/Index?" + params.toString();
+                },
+                filtrarSugerenciasModelo() {
+                    if (this.modelo.length < 3) {
+                        this.sugerenciasModelo = [];
+                        return;
+                    }
+                    const texto = this.modelo.toLowerCase();
+                    this.sugerenciasModelo = this.modelos.filter(m => m.toLowerCase().includes(texto));
+                },
+                seleccionarModelo(modeloSeleccionado) {
+                    this.modelo = modeloSeleccionado;
+                    this.sugerenciasModelo = [];
+                },
+                limpiarFiltros() {
+                    this.marca = '';
+                    this.modelo = '';
+                    this.estado = '';
+                    this.ano = '';
+                    window.location.href = "/Vehiculo/Index";
+                }
+            }
+        });
+    </script>
+}

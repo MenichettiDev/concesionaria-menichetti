@@ -65,13 +65,22 @@
         
         <div class="col-md-3">
             <label class="form-label">Año desde</label>
-            <input type="number" v-model="anoDesde" class="form-control" placeholder="Ej: 2010" />
+            <select v-model="anoDesde" class="form-select">
+                <option value="">Seleccionar año</option>
+                <option v-for="anio in anios" :key="'desde-' + anio" :value="anio">{{ anio }}</option>
+                <option value="otro">Otro...</option>
+            </select>
         </div>
 
         <div class="col-md-3">
             <label class="form-label">Año hasta</label>
-            <input type="number" v-model="anoHasta" class="form-control" placeholder="Ej: 2023" />
+            <select v-model="anoHasta" class="form-select">
+                <option value="">Seleccionar año</option>
+                <option v-for="anio in anios" :key="'hasta-' + anio" :value="anio">{{ anio }}</option>
+                <option value="otro">Otro...</option>
+            </select>
         </div>
+
 
         <div class="col-md-3">
             <label class="form-label">Estado</label>
@@ -118,22 +127,16 @@
                     </span>
                 </td>
                 <td class="text-nowrap">
-                    <a asp-action="Detalles" asp-route-id="@vehiculo.Id" class="btn btn-outline-info btn-sm" title="Details">
+                    <a asp-action="Details" asp-route-id="@vehiculo.Id" class="btn btn-outline-info btn-sm" title="Detalles">
                         <i class="bi bi-info-circle-fill"></i>
                     </a>
-                    <a asp-action="Editar" asp-route-id="@vehiculo.Id" class="btn btn-outline-warning btn-sm" title="Edit">
+                    <a asp-action="Edit" asp-route-id="@vehiculo.Id" class="btn btn-outline-warning btn-sm" title="Editar">
                         <i class="bi bi-pencil-square"></i>
                     </a>
                     @if (vehiculo.Estado == 1)
                     {
-                        <a asp-action="Desactivar" asp-route-id="@vehiculo.Id" class="btn btn-outline-danger btn-sm" title="Delete">
+                        <a asp-action="Delete" asp-route-id="@vehiculo.Id" class="btn btn-outline-danger btn-sm" title="Eliminar">
                             <i class="bi bi-slash-circle"></i>
-                        </a>
-                    }
-                    else
-                    {
-                        <a asp-action="Activar" asp-route-id="@vehiculo.Id" class="btn btn-outline-success btn-sm" title="Activar">
-                            <i class="bi bi-arrow-repeat"></i>
                         </a>
                     }
                 </td>
@@ -204,6 +207,7 @@
             data: {
                 marca: '@Context.Request.Query["marca"]',
                 modelo: '@Context.Request.Query["modelo"]',
+                anios: Array.from({ length: 25 }, (_, i) => new Date().getFullYear() - i),
                 anoDesde: '@Context.Request.Query["anoDesde"]',
                 anoHasta: '@Context.Request.Query["anoHasta"]',
                 estado: '@Context.Request.Query["estado"]',
@@ -230,9 +234,10 @@
                     const params = new URLSearchParams();
                     if (this.marca) params.append("marca", this.marca);
                     if (this.estado) params.append("estado", this.estado);
-                    if (this.anoDesde) params.append("anoDesde", this.anoDesde);
-                    if (this.anoHasta) params.append("anoHasta", this.anoHasta);
+                    if (this.anoDesde && this.anoDesde !== "otro") params.append("anoDesde", this.anoDesde);
+                    if (this.anoHasta && this.anoHasta !== "otro") params.append("anoHasta", this.anoHasta);
                     if (this.modelo) params.append("modelo", this.modelo);
+                    console.log(params.toString());
                     window.location.href = "/Vehiculo/Index?" + params.toString();
                 },
                 filtrarSugerenciasModelo() {

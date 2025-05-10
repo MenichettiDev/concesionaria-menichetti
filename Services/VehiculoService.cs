@@ -14,38 +14,51 @@ public class VehiculoService
         _vehiculoRepository = vehiculoRepository;
     }
 
-    public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(string marca, int? estado, int? ano, int page, int pageSize)
+    public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(string marca, string modelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
     {
         var query = _vehiculoRepository.GetQueryable();
 
-        // Aplicar filtros
+        // Filtros
         if (!string.IsNullOrEmpty(marca))
         {
             query = query.Where(v => v.Marca.Contains(marca));
         }
+
+        if (!string.IsNullOrEmpty(modelo))
+        {
+            query = query.Where(v => v.Modelo.Contains(modelo));
+        }
+
         if (estado.HasValue)
         {
             query = query.Where(v => v.Estado == estado.Value);
         }
-        if (ano.HasValue)
+
+        if (anoDesde.HasValue)
         {
-            query = query.Where(v => v.Año == ano.Value);
+            query = query.Where(v => v.Año >= anoDesde.Value);
         }
 
-        // Contar los elementos totales
+        if (anoHasta.HasValue)
+        {
+            query = query.Where(v => v.Año <= anoHasta.Value);
+        }
+
+        // Total de vehículos filtrados
         var totalVehiculos = await query.CountAsync();
 
-        // Obtener los resultados paginados
+        // Paginación
         var vehiculos = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
 
-        // Calcular el total de páginas
         int totalPaginas = (int)Math.Ceiling(totalVehiculos / (double)pageSize);
 
         return (vehiculos, totalPaginas);
     }
+
+
     public async Task<IEnumerable<Vehiculo>> ObtenerVehiculosActivosAsync()
     {
         try

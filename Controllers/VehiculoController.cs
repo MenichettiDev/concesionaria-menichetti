@@ -14,14 +14,14 @@ namespace InmobiliariaApp.Controllers
             _vehiculoService = vehiculoService;
         }
 
-        public async Task<IActionResult> Index(string marca, int? estado, int? ano, int page = 1)
+        public async Task<IActionResult> Index(string marca, string modelo, int? anoDesde, int? anoHasta, int? estado, int page = 1)
         {
             try
             {
                 // Configuración de la cantidad de elementos por página
                 int pageSize = 10;
 
-                var result = await _vehiculoService.ObtenerVehiculosFiltradosAsync(marca, estado, ano, page, pageSize);
+                var result = await _vehiculoService.ObtenerVehiculosFiltradosAsync(marca, modelo, anoDesde, anoHasta, estado, page, pageSize);
 
                 // Pasar los resultados y la información de paginación a la vista
                 ViewBag.PaginaActual = page;

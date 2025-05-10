@@ -43,5 +43,5 @@ public partial class Usuario
 
     public virtual ICollection<Suscripcione> Suscripciones { get; set; } = new List<Suscripcione>();
 
-    public virtual ICollection<Vehiculo> Vehiculo { get; set; } = new List<Vehiculo>();
+    public virtual ICollection<Vehiculo> Vehiculos { get; set; } = new List<Vehiculo>();
 }

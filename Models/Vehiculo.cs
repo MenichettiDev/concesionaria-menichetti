@@ -9,9 +9,7 @@ public partial class Vehiculo
 
     public int? UsuarioId { get; set; }
 
-    public string? Marca { get; set; }
-
-    public string? Modelo { get; set; }
+    public int IdModelo { get; set; }
 
     public int? Año { get; set; }
 
@@ -34,6 +32,8 @@ public partial class Vehiculo
     public virtual ICollection<Favorito> Favoritos { get; set; } = new List<Favorito>();
 
     public virtual ICollection<FotosVehiculo> FotosVehiculos { get; set; } = new List<FotosVehiculo>();
+
+    public virtual Modelo IdModeloNavigation { get; set; } = null!;
 
     public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();
 

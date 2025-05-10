@@ -32,6 +32,10 @@ public partial class ConcesionariaContext : DbContext
 
     public virtual DbSet<FotosVehiculo> FotosVehiculos { get; set; }
 
+    public virtual DbSet<Marca> Marcas { get; set; }
+
+    public virtual DbSet<Modelo> Modelos { get; set; }
+
     public virtual DbSet<Pago> Pagos { get; set; }
 
     public virtual DbSet<PlanesConcesionarium> PlanesConcesionaria { get; set; }
@@ -58,7 +62,7 @@ public partial class ConcesionariaContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_accesos_pagados");
+            entity.ToTable("accesos_pagados");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -74,18 +78,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.AccesosPagados)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_accesos_pagados_ibfk_1");
+                .HasConstraintName("accesos_pagados_ibfk_1");
 
             entity.HasOne(d => d.Vehiculo).WithMany(p => p.AccesosPagados)
                 .HasForeignKey(d => d.VehiculoId)
-                .HasConstraintName("tb_accesos_pagados_ibfk_2");
+                .HasConstraintName("accesos_pagados_ibfk_2");
         });
 
         modelBuilder.Entity<Comentario>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_comentarios");
+            entity.ToTable("comentarios");
 
             entity.HasIndex(e => e.CompradorId, "compradorId");
 
@@ -105,18 +109,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Comprador).WithMany(p => p.ComentarioCompradors)
                 .HasForeignKey(d => d.CompradorId)
-                .HasConstraintName("tb_comentarios_ibfk_1");
+                .HasConstraintName("comentarios_ibfk_1");
 
             entity.HasOne(d => d.Vendedor).WithMany(p => p.ComentarioVendedors)
                 .HasForeignKey(d => d.VendedorId)
-                .HasConstraintName("tb_comentarios_ibfk_2");
+                .HasConstraintName("comentarios_ibfk_2");
         });
 
         modelBuilder.Entity<Concesionaria>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_concesionarias");
+            entity.ToTable("concesionarias");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -134,14 +138,14 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Concesionaria)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_concesionarias_ibfk_1");
+                .HasConstraintName("concesionarias_ibfk_1");
         });
 
         modelBuilder.Entity<ContratosPlane>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_contratos_planes");
+            entity.ToTable("contratos_planes");
 
             entity.HasIndex(e => e.ConcesionariaId, "concesionariaId");
 
@@ -158,18 +162,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Concesionaria).WithMany(p => p.ContratosPlanes)
                 .HasForeignKey(d => d.ConcesionariaId)
-                .HasConstraintName("tb_contratos_planes_ibfk_1");
+                .HasConstraintName("contratos_planes_ibfk_1");
 
             entity.HasOne(d => d.Plan).WithMany(p => p.ContratosPlanes)
                 .HasForeignKey(d => d.PlanId)
-                .HasConstraintName("tb_contratos_planes_ibfk_2");
+                .HasConstraintName("contratos_planes_ibfk_2");
         });
 
         modelBuilder.Entity<Destacado>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_destacados");
+            entity.ToTable("destacados");
 
             entity.HasIndex(e => e.VehiculoId, "vehiculoId");
 
@@ -185,14 +189,14 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Vehiculo).WithMany(p => p.Destacados)
                 .HasForeignKey(d => d.VehiculoId)
-                .HasConstraintName("tb_destacados_ibfk_1");
+                .HasConstraintName("destacados_ibfk_1");
         });
 
         modelBuilder.Entity<EmpleadosConcesionarium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_empleados_concesionaria");
+            entity.ToTable("empleados_concesionaria");
 
             entity.HasIndex(e => e.ConcesionariaId, "concesionariaId");
 
@@ -204,18 +208,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Concesionaria).WithMany(p => p.EmpleadosConcesionaria)
                 .HasForeignKey(d => d.ConcesionariaId)
-                .HasConstraintName("tb_empleados_concesionaria_ibfk_1");
+                .HasConstraintName("empleados_concesionaria_ibfk_1");
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.EmpleadosConcesionaria)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_empleados_concesionaria_ibfk_2");
+                .HasConstraintName("empleados_concesionaria_ibfk_2");
         });
 
         modelBuilder.Entity<Favorito>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_favoritos");
+            entity.ToTable("favoritos");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -227,18 +231,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Favoritos)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_favoritos_ibfk_1");
+                .HasConstraintName("favoritos_ibfk_1");
 
             entity.HasOne(d => d.Vehiculo).WithMany(p => p.Favoritos)
                 .HasForeignKey(d => d.VehiculoId)
-                .HasConstraintName("tb_favoritos_ibfk_2");
+                .HasConstraintName("favoritos_ibfk_2");
         });
 
         modelBuilder.Entity<FotosVehiculo>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_fotos_vehiculo");
+            entity.ToTable("fotos_vehiculo");
 
             entity.HasIndex(e => e.VehiculoId, "vehiculoId");
 
@@ -258,14 +262,46 @@ public partial class ConcesionariaContext : DbContext
             entity.HasOne(d => d.Vehiculo).WithMany(p => p.FotosVehiculos)
                 .HasForeignKey(d => d.VehiculoId)
                 .OnDelete(DeleteBehavior.Cascade)
-                .HasConstraintName("tb_fotos_vehiculo_ibfk_1");
+                .HasConstraintName("fotos_vehiculo_ibfk_1");
+        });
+
+        modelBuilder.Entity<Marca>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("marca");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(20)
+                .HasColumnName("descripcion");
+        });
+
+        modelBuilder.Entity<Modelo>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("modelo");
+
+            entity.HasIndex(e => e.IdMarca, "idMarca");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(20)
+                .HasColumnName("descripcion");
+            entity.Property(e => e.IdMarca).HasColumnName("idMarca");
+
+            entity.HasOne(d => d.IdMarcaNavigation).WithMany(p => p.Modelos)
+                .HasForeignKey(d => d.IdMarca)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("modelo_ibfk_1");
         });
 
         modelBuilder.Entity<Pago>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_pagos");
+            entity.ToTable("pagos");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -287,14 +323,14 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Pagos)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_pagos_ibfk_1");
+                .HasConstraintName("pagos_ibfk_1");
         });
 
         modelBuilder.Entity<PlanesConcesionarium>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_planes_concesionaria");
+            entity.ToTable("planes_concesionaria");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CantidadPublicaciones).HasColumnName("cantidadPublicaciones");
@@ -313,7 +349,7 @@ public partial class ConcesionariaContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_reportes");
+            entity.ToTable("reportes");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -332,18 +368,18 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Reportes)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_reportes_ibfk_1");
+                .HasConstraintName("reportes_ibfk_1");
 
             entity.HasOne(d => d.Vehiculo).WithMany(p => p.Reportes)
                 .HasForeignKey(d => d.VehiculoId)
-                .HasConstraintName("tb_reportes_ibfk_2");
+                .HasConstraintName("reportes_ibfk_2");
         });
 
         modelBuilder.Entity<Suscripcione>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_suscripciones");
+            entity.ToTable("suscripciones");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -355,14 +391,14 @@ public partial class ConcesionariaContext : DbContext
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Suscripciones)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_suscripciones_ibfk_1");
+                .HasConstraintName("suscripciones_ibfk_1");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_usuarios");
+            entity.ToTable("usuarios");
 
             entity.HasIndex(e => e.Email, "email").IsUnique();
 
@@ -400,7 +436,9 @@ public partial class ConcesionariaContext : DbContext
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("tb_vehiculos");
+            entity.ToTable("vehiculos");
+
+            entity.HasIndex(e => e.IdModelo, "idModelo");
 
             entity.HasIndex(e => e.UsuarioId, "usuarioId");
 
@@ -418,21 +456,21 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.FechaDestacado)
                 .HasColumnType("timestamp")
                 .HasColumnName("fechaDestacado");
+            entity.Property(e => e.IdModelo).HasColumnName("idModelo");
             entity.Property(e => e.Kilometraje).HasColumnName("kilometraje");
-            entity.Property(e => e.Marca)
-                .HasMaxLength(50)
-                .HasColumnName("marca");
-            entity.Property(e => e.Modelo)
-                .HasMaxLength(50)
-                .HasColumnName("modelo");
             entity.Property(e => e.Precio)
                 .HasPrecision(12, 2)
                 .HasColumnName("precio");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.Vehiculo)
+            entity.HasOne(d => d.IdModeloNavigation).WithMany(p => p.Vehiculos)
+                .HasForeignKey(d => d.IdModelo)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("vehiculos_ibfk_2");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.Vehiculos)
                 .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("tb_vehiculos_ibfk_1");
+                .HasConstraintName("vehiculos_ibfk_1");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -291,7 +291,7 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("descripcion");
             entity.Property(e => e.IdMarca).HasColumnName("idMarca");
 
-            entity.HasOne(d => d.IdMarcaNavigation).WithMany(p => p.Modelos)
+            entity.HasOne(d => d.Marca).WithMany(p => p.Modelos)
                 .HasForeignKey(d => d.IdMarca)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("modelo_ibfk_1");
@@ -463,7 +463,7 @@ public partial class ConcesionariaContext : DbContext
                 .HasColumnName("precio");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
-            entity.HasOne(d => d.IdModeloNavigation).WithMany(p => p.Vehiculos)
+            entity.HasOne(d => d.Modelo).WithMany(p => p.Vehiculos)
                 .HasForeignKey(d => d.IdModelo)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("vehiculos_ibfk_2");

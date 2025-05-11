@@ -7,32 +7,49 @@ namespace InmobiliariaApp.Controllers
 {
     public class VehiculoController : Controller
     {
-        private readonly VehiculoService _vehiculoService;
+        private readonly VehiculoRepository _vehiculoRepository;
 
-        public VehiculoController(VehiculoService vehiculoService)
+        public VehiculoController(VehiculoRepository vehiculoRepository)
         {
-            _vehiculoService = vehiculoService;
+            _vehiculoRepository = vehiculoRepository;
         }
 
-        public async Task<IActionResult> Index(string marca, string modelo, int? anoDesde, int? anoHasta, int? estado, int page = 1)
+        public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page = 1)
         {
             try
             {
-                // Configuración de la cantidad de elementos por página
                 int pageSize = 10;
 
-                var result = await _vehiculoService.ObtenerVehiculosFiltradosAsync(marca, modelo, anoDesde, anoHasta, estado, page, pageSize);
+                var result = await _vehiculoRepository.ObtenerVehiculosFiltradosAsync(idMarca, idModelo, anoDesde, anoHasta, estado, page, pageSize);
 
-                // Pasar los resultados y la información de paginación a la vista
+                // Obtenemos las marcas y modelos únicos
+                var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
+                var modelos = await _vehiculoRepository.GetModelosAsync(); // Método para obtener los modelos
+
                 ViewBag.PaginaActual = page;
                 ViewBag.TotalPaginas = result.TotalPaginas;
+
+                //pasamos la data a la vista
+                ViewBag.Marcas = marcas.Select(m => new
+                {
+                    id = m.Id,
+                    descripcion = m.Descripcion
+                }).ToList();
+
+                ViewBag.Modelos = modelos.Select(m => new
+                {
+                    id = m.Id,
+                    descripcion = m.Descripcion,
+                    idMarca = m.IdMarca
+                }).ToList();
+
 
                 return View(result.Vehiculos);
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al cargar los vehículos activos: {ex.Message}";
-                return View(); // Vista vacía con error
+                ViewBag.ErrorMessage = $"Error al cargar los vehículos: {ex.Message}";
+                return View();
             }
         }
 
@@ -43,7 +60,7 @@ namespace InmobiliariaApp.Controllers
 
             try
             {
-                var vehiculo = await _vehiculoService.GetVehiculoByIdAsync(id.Value);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id.Value);
                 if (vehiculo == null) return NotFound();
                 return View(vehiculo);
             }
@@ -71,7 +88,7 @@ namespace InmobiliariaApp.Controllers
                     return View(vehiculo);
                 }
 
-                await _vehiculoService.CreateVehiculoAsync(vehiculo);
+                await _vehiculoRepository.CreateVehiculoAsync(vehiculo);
                 TempData["SuccessMessage"] = "Vehículo creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -88,7 +105,7 @@ namespace InmobiliariaApp.Controllers
 
             try
             {
-                var vehiculo = await _vehiculoService.GetVehiculoByIdAsync(id.Value);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id.Value);
                 if (vehiculo == null) return NotFound();
                 return View(vehiculo);
             }
@@ -113,7 +130,7 @@ namespace InmobiliariaApp.Controllers
                     return View(vehiculo);
                 }
 
-                await _vehiculoService.UpdateVehiculoAsync(vehiculo);
+                await _vehiculoRepository.UpdateVehiculoAsync(vehiculo);
                 TempData["SuccessMessage"] = "Vehículo actualizado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
@@ -130,7 +147,7 @@ namespace InmobiliariaApp.Controllers
 
             try
             {
-                var vehiculo = await _vehiculoService.GetVehiculoByIdAsync(id.Value);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id.Value);
                 if (vehiculo == null) return NotFound();
                 return View(vehiculo);
             }
@@ -147,14 +164,14 @@ namespace InmobiliariaApp.Controllers
         {
             try
             {
-                await _vehiculoService.DeleteVehiculoAsync(id);
+                await _vehiculoRepository.DeleteVehiculoAsync(id);
                 TempData["SuccessMessage"] = "Vehículo eliminado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
                 ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el vehículo: {ex.Message}";
-                var vehiculo = await _vehiculoService.GetVehiculoByIdAsync(id);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id);
                 return View("Delete", vehiculo);
             }
         }

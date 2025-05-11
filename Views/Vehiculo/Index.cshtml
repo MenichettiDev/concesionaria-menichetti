@@ -36,33 +36,27 @@
 
 <div id="filtros" class="mb-4 p-3 bg-light rounded shadow-sm">
     <div class="row g-2">
+        <!-- Filtro Marca: Ahora es un select -->
         <div class="col-md-3">
             <label class="form-label">Marca</label>
-            <input type="text" v-model="marca" @@input="filtrarSugerencias" class="form-control" placeholder="Escribí una marca" autocomplete="off">
-            <ul v-if="sugerencias.length > 0" class="list-group position-absolute mt-1 shadow" style="z-index: 1000;">
-                <li 
-                    class="list-group-item list-group-item-action" 
-                    v-for="s in sugerencias" 
-                    @@click="seleccionarMarca(s)">
-                    {{ s }}
-                </li>
-            </ul>
-            </input>   
+            <select v-model="marca" class="form-select">
+                <option value="">Seleccionar marca</option>
+                <option v-for="m in marcas" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+            </select>
+
         </div>
 
+        <!-- Filtro Modelo: Ahora es un select -->
         <div class="col-md-3">
             <label class="form-label">Modelo</label>
-            <input type="text" v-model="modelo" @@input="filtrarSugerenciasModelo" class="form-control" placeholder="Escribí un modelo" autocomplete="off">
-            <ul v-if="sugerenciasModelo.length > 0" class="list-group position-absolute mt-1 shadow" style="z-index: 1000;">
-                <li 
-                    class="list-group-item list-group-item-action" 
-                    v-for="s in sugerenciasModelo" 
-                    @@click="seleccionarModelo(s)">
-                    {{ s }}
-                </li>
-            </ul>
+            <select v-model="modelo" class="form-select">
+                <option value="">Seleccionar modelo</option>
+                <option v-for="m in modelosFiltrados" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+            </select>
         </div>
-        
+
+
+        <!-- Filtro Año Desde -->
         <div class="col-md-3">
             <label class="form-label">Año desde</label>
             <select v-model="anoDesde" class="form-select">
@@ -72,6 +66,7 @@
             </select>
         </div>
 
+        <!-- Filtro Año Hasta -->
         <div class="col-md-3">
             <label class="form-label">Año hasta</label>
             <select v-model="anoHasta" class="form-select">
@@ -81,7 +76,7 @@
             </select>
         </div>
 
-
+        <!-- Filtro Estado -->
         <div class="col-md-3">
             <label class="form-label">Estado</label>
             <select v-model="estado" class="form-select">
@@ -90,7 +85,7 @@
             </select>
         </div>
 
-
+        <!-- Botones de Filtrar y Limpiar -->
         <div class="col-md-3 d-flex align-items-end gap-2">
             <button @@click="filtrar" class="btn btn-primary w-50" type="button">
                 <i class="bi bi-funnel-fill"></i> Filtrar
@@ -118,8 +113,8 @@
         {
             <tr>
                 <td>@vehiculo.Id</td>
-                <td>@vehiculo.Marca</td>
-                <td>@vehiculo.Modelo</td>
+                <td>@(vehiculo.Modelo?.Marca?.Descripcion ?? "Sin marca")</td>
+                <td>@(vehiculo.Modelo?.Descripcion ?? "Sin modelo")</td>
                 <td>@vehiculo.Año</td>
                 <td>
                     <span class="badge @(vehiculo.Estado == 1 ? "bg-success" : "bg-danger")">
@@ -211,25 +206,19 @@
                 anoDesde: '@Context.Request.Query["anoDesde"]',
                 anoHasta: '@Context.Request.Query["anoHasta"]',
                 estado: '@Context.Request.Query["estado"]',
-                modelos: @Html.Raw(JsonSerializer.Serialize(Model.Select(v => v.Modelo).Distinct())),
-                marcas: @Html.Raw(JsonSerializer.Serialize(Model.Select(v => v.Marca).Distinct())),
-                sugerencias: [],
-                sugerenciasModelo: []
+                modelos: @Html.Raw(JsonSerializer.Serialize(ViewBag.Modelos)),  // Usando ViewBag.Modelos
+                marcas: @Html.Raw(JsonSerializer.Serialize(ViewBag.Marcas)),  
             },
-
-            methods: {
-                filtrarSugerencias() {
-                    if (this.marca.length < 3) {
-                        this.sugerencias = [];
-                        return;
+            computed: {
+                modelosFiltrados() {
+                    if (this.marca) {
+                        return this.modelos.filter(modelo => modelo.idMarca === parseInt(this.marca));
                     }
-                    const texto = this.marca.toLowerCase();
-                    this.sugerencias = this.marcas.filter(m => m.toLowerCase().includes(texto));
-                },
-                seleccionarMarca(marcaSeleccionada) {
-                    this.marca = marcaSeleccionada;
-                    this.sugerencias = [];
-                },
+                    return this.modelos;
+                }
+
+            },
+            methods: {
                 filtrar() {
                     const params = new URLSearchParams();
                     if (this.marca) params.append("marca", this.marca);
@@ -237,20 +226,7 @@
                     if (this.anoDesde && this.anoDesde !== "otro") params.append("anoDesde", this.anoDesde);
                     if (this.anoHasta && this.anoHasta !== "otro") params.append("anoHasta", this.anoHasta);
                     if (this.modelo) params.append("modelo", this.modelo);
-                    console.log(params.toString());
                     window.location.href = "/Vehiculo/Index?" + params.toString();
-                },
-                filtrarSugerenciasModelo() {
-                    if (this.modelo.length < 3) {
-                        this.sugerenciasModelo = [];
-                        return;
-                    }
-                    const texto = this.modelo.toLowerCase();
-                    this.sugerenciasModelo = this.modelos.filter(m => m.toLowerCase().includes(texto));
-                },
-                seleccionarModelo(modeloSeleccionado) {
-                    this.modelo = modeloSeleccionado;
-                    this.sugerenciasModelo = [];
                 },
                 limpiarFiltros() {
                     this.marca = '';

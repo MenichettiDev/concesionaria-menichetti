@@ -165,6 +165,28 @@ public class VehiculoRepository
         }
     }
 
+    public async Task BajaLogicaVehiculoAsync(int id)
+    {
+        try
+        {
+            var vehiculo = await _context.Vehiculos.FindAsync(id);
+            if (vehiculo != null)
+            {
+                vehiculo.Estado = 0; // Estado inactivo
+                _context.Vehiculos.Update(vehiculo);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception($"No se encontró el vehículo con ID {id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al dar de baja el vehículo con ID {id}", ex);
+        }
+    }
+
 
 
 }

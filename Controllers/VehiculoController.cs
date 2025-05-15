@@ -48,7 +48,7 @@ namespace InmobiliariaApp.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al cargar los vehículos: {ex.Message}";
+                ViewBag.ErrorMessage = $"Error al cargar los vehiculos: {ex.Message}";
                 return View();
             }
         }
@@ -66,7 +66,7 @@ namespace InmobiliariaApp.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al obtener los detalles del vehículo: {ex.Message}";
+                ViewBag.ErrorMessage = $"Error al obtener los detalles del vehiculo: {ex.Message}";
                 return View();
             }
         }
@@ -103,20 +103,14 @@ namespace InmobiliariaApp.Controllers
         {
             try
             {
-                // Console.WriteLine(vehiculo);
-                // if (!ModelState.IsValid)
-                // {
-                //     ViewBag.ErrorMessage = "Por favor complete correctamente todos los campos.";
-                //     return View(vehiculo);
-                // }
 
                 await _vehiculoRepository.CreateVehiculoAsync(vehiculo);
-                TempData["SuccessMessage"] = "Vehículo creado correctamente.";
+                TempData["SuccessMessage"] = "Vehiculo creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Ocurrió un error al crear el vehículo: {ex.Message}";
+                ViewBag.ErrorMessage = $"Ocurrio un error al crear el vehiculo: {ex.Message}";
                 return View(vehiculo);
             }
         }
@@ -133,7 +127,7 @@ namespace InmobiliariaApp.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al cargar el formulario de edición: {ex.Message}";
+                ViewBag.ErrorMessage = $"Error al cargar el formulario de edicion: {ex.Message}";
                 return View();
             }
         }
@@ -154,12 +148,12 @@ namespace InmobiliariaApp.Controllers
                 vehiculo.UsuarioId = 1; //TODO: modificar cuando aplique login
                 vehiculo.Estado = 1;
                 await _vehiculoRepository.UpdateVehiculoAsync(vehiculo);
-                TempData["SuccessMessage"] = "Vehículo actualizado correctamente.";
-                return RedirectToAction(nameof(Index));
+                TempData["SuccessMessage"] = "Vehiculo actualizado correctamente.";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Ocurrió un error al actualizar el vehículo: {ex.Message}";
+                ViewBag.ErrorMessage = $"Ocurrio un error al actualizar el vehiculo: {ex.Message}";
                 return View(vehiculo);
             }
         }
@@ -176,26 +170,24 @@ namespace InmobiliariaApp.Controllers
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al cargar la confirmación de eliminación: {ex.Message}";
+                ViewBag.ErrorMessage = $"Error al cargar la confirmacion de eliminacion: {ex.Message}";
                 return View();
             }
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
+        [HttpPost, ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
             {
-                await _vehiculoRepository.DeleteVehiculoAsync(id);
-                TempData["SuccessMessage"] = "Vehículo eliminado correctamente.";
-                return RedirectToAction(nameof(Index));
+                await _vehiculoRepository.BajaLogicaVehiculoAsync(id);
+                TempData["SuccessMessage"] = "Vehiculo eliminado correctamente.";
+                return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Ocurrió un error al eliminar el vehículo: {ex.Message}";
-                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id);
-                return View("Delete", vehiculo);
+                TempData["ErrorMessage"] = $"Ocurrio un error al eliminar el vehiculo: {ex.Message}";
+                return RedirectToAction("Index");
             }
         }
     }

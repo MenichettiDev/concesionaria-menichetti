@@ -96,7 +96,14 @@
         </div>
     </div>
 </div>
-
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle-fill"></i> No hay vehículos publicados.
+    </div>
+}
+else
+{
 <table class="table table-bordered table-hover shadow-sm align-middle bg-white table-striped">
     <thead class="table-dark">
         <tr>
@@ -130,16 +137,24 @@
                     </a>
                     @if (vehiculo.Estado == 1)
                     {
-                        <a asp-action="Delete" asp-route-id="@vehiculo.Id" class="btn btn-outline-danger btn-sm" title="Eliminar">
+                        <button type="button"
+                                class="btn btn-outline-danger btn-sm"
+                                title="Eliminar"
+                                data-bs-toggle="modal"
+                                data-bs-target="#modalEliminar"
+                                data-id="@vehiculo.Id"
+                                data-marca="@vehiculo.Modelo?.Marca?.Descripcion"
+                                data-modelo="@vehiculo.Modelo?.Descripcion">
                             <i class="bi bi-slash-circle"></i>
-                        </a>
+                        </button>
+
                     }
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
+}
 <div class="d-flex justify-content-between mb-3">
     <div>
         Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
@@ -195,6 +210,30 @@
     </ul>
 </nav>
 
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" asp-action="DeleteConfirmed">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="modalEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="vehiculoId" />
+                    ¿Estás seguro que deseas eliminar el vehículo <strong id="vehiculoInfo"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
 @section Scripts {
     <script>
         new Vue({
@@ -237,5 +276,17 @@
                 }
             }
         });
+
+        const modalEliminar = document.getElementById('modalEliminar');
+    modalEliminar.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute('data-id');
+        const marca = button.getAttribute('data-marca') || 'Sin marca';
+        const modelo = button.getAttribute('data-modelo') || 'Sin modelo';
+
+        // Asignar valores al modal
+        document.getElementById('vehiculoId').value = id;
+        document.getElementById('vehiculoInfo').textContent = `${marca} ${modelo}`;
+    });
     </script>
 }

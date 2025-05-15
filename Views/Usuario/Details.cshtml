@@ -1,0 +1,48 @@
+@model concesionaria_menichetti.Models.Usuario
+
+@{
+    ViewData["Title"] = "Detalles del Usuario";
+}
+
+<h1 class="mb-4"><i class="bi bi-info-circle-fill"></i> @ViewData["Title"]</h1>
+
+<div class="card shadow rounded p-4 mb-4 bg-light">
+    <div class="row g-4">
+        <div class="col-md-6">
+            <h5><strong>Nombre:</strong> @Model.Nombre </h5>
+            <p><strong>Email:</strong> @Model.Email</p>
+            <p><strong>Teléfono:</strong> @Model.Telefono </p>
+            <p><strong>Ubicación:</strong> @Model.Ubicacion </p>
+        </div>
+
+        <div class="col-md-6">
+            <p>
+                <strong>Tipo de Usuario:</strong>
+                <span class="badge bg-@(Model.EsConcesionaria == true ? "primary" : "secondary")">
+                    @(Model.EsConcesionaria == true ? "Concesionaria" : "Particular")
+                </span>
+            </p>
+            <p>
+                <strong>Verificado:</strong>
+                <span class="badge bg-@(Model.Verificado == true ? "success" : "warning")">
+                    @(Model.Verificado == true ? "Sí" : "No")
+                </span>
+            </p>
+            <p>
+                <strong>Estado:</strong>
+                <span class="badge bg-@(Model.Activo == true ? "success" : "danger")">
+                    @(Model.Activo == true ? "Activo" : "Inactivo")
+                </span>
+            </p>
+            @if (!string.IsNullOrEmpty(Model.FotoPerfil))
+            {
+                <p><strong>Foto de Perfil:</strong></p>
+                <img src="@Model.FotoPerfil" class="img-thumbnail" style="max-height: 150px;" alt="Foto de perfil" />
+            }
+        </div>
+    </div>
+</div>
+
+<a href="@Url.Action("Index", "Usuario")" class="btn btn-outline-secondary">
+    <i class="bi bi-arrow-left"></i> Volver al listado
+</a>

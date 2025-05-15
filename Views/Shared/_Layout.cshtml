@@ -27,13 +27,13 @@
         {
             <a asp-area="" asp-controller="Home" asp-action="Index">🏠 Inicio</a>
             <a asp-controller="Vehiculo" asp-action="Index">🚘 Vehículos</a>
-            @* <a asp-controller="Cliente" asp-action="Index">👤 Clientes</a>
-            <a asp-controller="Venta" asp-action="Index">🧾 Ventas</a>
-            <a asp-controller="Usuario" asp-action="Perfil">⚙️ Perfil</a> *@
+            <a asp-controller="Usuario" asp-action="Index">⚙️ Admin Usuarios</a>
+            @* <a asp-controller="Cliente" asp-action="Index">👤 Clientes</a> *@
+            @* <a asp-controller="Venta" asp-action="Index">🧾 Ventas</a> *@
 
             @if (User.IsInRole("Administrador"))
             {
-                <a asp-controller="Usuario" asp-action="Listar">🛠️ Admin Usuarios</a>
+                <a asp-controller="Usuario" asp-action="Index">🛠️ Admin Usuarios</a>
             }
 
             <a asp-controller="Usuario" asp-action="Logout">🚪 Cerrar Sesión</a>

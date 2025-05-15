@@ -7,6 +7,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<VehiculoRepository>();
+builder.Services.AddScoped<UsuarioRepository>();
 
 
 //Agregar el contexto de la base de datos a la inyección de dependencias

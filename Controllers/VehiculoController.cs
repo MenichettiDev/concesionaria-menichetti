@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace InmobiliariaApp.Controllers
+namespace ConcesionariaApp.Controllers
 {
     public class VehiculoController : Controller
     {

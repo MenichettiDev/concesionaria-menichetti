@@ -20,25 +20,57 @@
     <input type="hidden" asp-for="Id" />
     <div class="form-group">
         <label for="Marca">Marca</label>
-        <input type="text" class="form-control" asp-for="Modelo.Marca" required />
+        <input type="text" class="form-control" asp-for="Modelo.Marca.Descripcion" required />
     </div>
     <div class="form-group">
         <label for="Modelo">Modelo</label>
-        <input type="text" class="form-control" asp-for="Modelo" required />
+        <input type="text" class="form-control" asp-for="Modelo.Descripcion" required />
     </div>
     <div class="form-group">
-        <label for="Año">Año</label>
-        <input type="number" class="form-control" asp-for="Año" required />
+        <label for="Anio">Año</label>
+        <input type="number" class="form-control" asp-for="Anio" required />
     </div>
     <div class="form-group">
-        <label for="Estado">Estado</label>
-        <select class="form-control" asp-for="Estado">
-            @* <option value="Activo" @if (Model.Estado == 0) { <text>selected</text> }>Activo</option>
-            <option value="Inactivo" @if (Model.Estado == 1) { <text>selected</text> }>Inactivo</option> *@
+        <label for="Precio">Precio</label>
+        <input type="number" class="form-control" asp-for="Precio" step="0.01" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Kilometraje">Kilometraje</label>
+        <input type="number" class="form-control" asp-for="Kilometraje" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Combustible">Combustible</label>
+        <select class="form-control" asp-for="Combustible" required>
+            <option value="">Seleccionar tipo</option>
+            <option value="Nafta">Nafta</option>
+            <option value="Nafta/ GNC">Nafta/ GNC</option>
+            <option value="Gasoil">Gasoil</option>
         </select>
+    </div>
+
+    <div class="form-group">
+        <div class="form-group">
+            <label>Estado</label>
+            <input type="text" class="form-control" value="@(Model.Estado == 1 ? "Activo" : "Inactivo")" readonly />
+        </div>
+
     </div>
     <div class="mt-3">
         <a href="@Url.Action("Index", "Vehiculo")" class="btn btn-secondary">Volver al listado</a>
         <button type="submit" class="btn btn-primary">Guardar</button>
     </div>
 </form>
+
+@section Scripts {
+    <script>
+        new Vue({
+            el: '#idEstado  ',
+            data: {
+                estado: @Model.Estado  // Si lo estás pasando desde Razor
+                                                            }
+        })
+    </script>
+
+}

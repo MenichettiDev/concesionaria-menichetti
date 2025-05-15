@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace concesionaria_menichetti.Models;
 
@@ -10,9 +9,9 @@ public partial class Vehiculo
 
     public int? UsuarioId { get; set; }
 
-    public int IdModelo { get; set; }
+    public int? IdModelo { get; set; }
 
-    public int? Año { get; set; }
+    public int? Anio { get; set; }
 
     public decimal? Precio { get; set; }
 
@@ -34,7 +33,6 @@ public partial class Vehiculo
 
     public virtual ICollection<FotosVehiculo> FotosVehiculos { get; set; } = new List<FotosVehiculo>();
 
-    [ForeignKey("IdModelo")]
     public virtual Modelo Modelo { get; set; } = null!;
 
     public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();

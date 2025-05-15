@@ -46,12 +46,12 @@ public class VehiculoRepository
 
         if (anoDesde.HasValue)
         {
-            query = query.Where(v => v.Año >= anoDesde.Value);
+            query = query.Where(v => v.Anio >= anoDesde.Value);
         }
 
         if (anoHasta.HasValue)
         {
-            query = query.Where(v => v.Año <= anoHasta.Value);
+            query = query.Where(v => v.Anio <= anoHasta.Value);
         }
 
         var totalVehiculos = await query.CountAsync();

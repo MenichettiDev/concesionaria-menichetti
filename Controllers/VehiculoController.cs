@@ -26,8 +26,6 @@ namespace InmobiliariaApp.Controllers
                 var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
                 var modelos = await _vehiculoRepository.GetModelosAsync(); // Método para obtener los modelos
 
-                ViewBag.PaginaActual = page;
-                ViewBag.TotalPaginas = result.TotalPaginas;
 
                 //pasamos la data a la vista
                 ViewBag.Marcas = marcas.Select(m => new
@@ -43,6 +41,8 @@ namespace InmobiliariaApp.Controllers
                     idMarca = m.IdMarca
                 }).ToList();
 
+                ViewBag.PaginaActual = page;
+                ViewBag.TotalPaginas = result.TotalPaginas;
 
                 return View(result.Vehiculos);
             }
@@ -71,22 +71,44 @@ namespace InmobiliariaApp.Controllers
             }
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+
+            // Obtenemos las marcas y modelos únicos
+            var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
+            var modelos = await _vehiculoRepository.GetModelosAsync(); // Método para obtener los modelos
+
+
+            //pasamos la data a la vista
+            ViewBag.Marcas = marcas.Select(m => new
+            {
+                id = m.Id,
+                descripcion = m.Descripcion
+            }).ToList();
+
+            ViewBag.Modelos = modelos.Select(m => new
+            {
+                id = m.Id,
+                descripcion = m.Descripcion,
+                idMarca = m.IdMarca
+            }).ToList();
+
+
             return View();
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
+        // [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Vehiculo vehiculo)
         {
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    ViewBag.ErrorMessage = "Por favor complete correctamente todos los campos.";
-                    return View(vehiculo);
-                }
+                // Console.WriteLine(vehiculo);
+                // if (!ModelState.IsValid)
+                // {
+                //     ViewBag.ErrorMessage = "Por favor complete correctamente todos los campos.";
+                //     return View(vehiculo);
+                // }
 
                 await _vehiculoRepository.CreateVehiculoAsync(vehiculo);
                 TempData["SuccessMessage"] = "Vehículo creado correctamente.";
@@ -117,7 +139,6 @@ namespace InmobiliariaApp.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Vehiculo vehiculo)
         {
             if (id != vehiculo.Id) return NotFound();
@@ -130,6 +151,8 @@ namespace InmobiliariaApp.Controllers
                     return View(vehiculo);
                 }
 
+                vehiculo.UsuarioId = 1; //TODO: modificar cuando aplique login
+                vehiculo.Estado = 1;
                 await _vehiculoRepository.UpdateVehiculoAsync(vehiculo);
                 TempData["SuccessMessage"] = "Vehículo actualizado correctamente.";
                 return RedirectToAction(nameof(Index));

@@ -7,10 +7,9 @@
 <h1>@ViewData["Title"]</h1>
 
 <div>
-    <h3>Marca: @Model.Modelo.Marca</h3>
-    <h4>Modelo: @Model.Modelo</h4>
-    <p>Año: @Model.Año</p>
-    <p>Estado: @Model.Estado</p>
+    <h3>Marca: @Model.Modelo.Marca.Descripcion</h3>
+    <h4>Modelo: @Model.Modelo.Descripcion</h4>
+    <p>Año: @Model.Anio</p>
 </div>
 
 <a href="@Url.Action("Index", "Vehiculo")" class="btn btn-secondary">Volver al listado</a>

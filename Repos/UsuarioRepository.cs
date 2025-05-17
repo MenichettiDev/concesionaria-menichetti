@@ -126,4 +126,21 @@ public class UsuarioRepository
             throw new Exception($"Error al eliminar el usuario con ID {id}", ex);
         }
     }
+
+    public async Task<Usuario> GetByEmailAsync(string email)
+    {
+        // var usuario = new Usuario();
+        try
+        {
+            return await _context.Usuarios
+                .FirstOrDefaultAsync(u => u.Email == email);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al obtener el usuario con email {email}", ex);
+        }
+    }
+
+
+
 }

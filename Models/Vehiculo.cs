@@ -9,7 +9,7 @@ public partial class Vehiculo
 
     public int? UsuarioId { get; set; }
 
-    public int? IdModelo { get; set; }
+    public int IdModelo { get; set; }
 
     public int? Anio { get; set; }
 

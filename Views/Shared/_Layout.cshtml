@@ -18,7 +18,7 @@
     <!-- Sidebar -->
     <div class="sidebar">
         <h4>🚗 VM Autos</h4>
-        @if (User.Identity.IsAuthenticated)
+        @if (!User.Identity.IsAuthenticated)
         {
             <a asp-area="" asp-controller="Home" asp-action="Index">🏠 Inicio</a>
             <a asp-controller="Usuario" asp-action="Login">🔑 Iniciar Sesión</a>

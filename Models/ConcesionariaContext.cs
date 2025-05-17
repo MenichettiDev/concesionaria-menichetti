@@ -49,6 +49,7 @@ public partial class ConcesionariaContext : DbContext
     public virtual DbSet<Vehiculo> Vehiculos { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
         => optionsBuilder.UseMySql("server=localhost;database=concesionaria;user id=root", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.30-mysql"));
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -420,6 +421,10 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
                 .HasColumnName("nombre");
+            entity.Property(e => e.Rol)
+                .HasDefaultValueSql("'Usuario'")
+                .HasColumnType("enum('Admin','Usuario')")
+                .HasColumnName("rol");
             entity.Property(e => e.Telefono)
                 .HasMaxLength(20)
                 .HasColumnName("telefono");

@@ -7,6 +7,8 @@ public partial class Usuario
 {
     public int Id { get; set; }
 
+    public string Rol { get; set; } = null!;
+
     public string? Nombre { get; set; }
 
     public string Email { get; set; } = null!;

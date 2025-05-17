@@ -14,19 +14,31 @@ public class PlanesConcesionariaRepository : GenericRepository<PlanesConcesionar
         _context = context;
     }
 
-    public async Task<IEnumerable<PlanesConcesionarium>> ObtenerTodosAsync()
+    public async Task<(List<PlanesConcesionarium> Planes, int TotalPaginas)> ObtenerPlanesFiltradosAsync(
+    string nombre, int page, int pageSize)
     {
-        try
+        var query = _context.PlanesConcesionaria
+                            .Include(p => p.ContratosPlanes)
+                            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(nombre))
         {
-            return await _context.PlanesConcesionaria
-                .Include(p => p.ContratosPlanes)
-                .ToListAsync();
+            query = query.Where(p => p.Nombre != null && p.Nombre.Contains(nombre));
         }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al obtener los planes de concesionaria", ex);
-        }
+
+        var totalPlanes = await query.CountAsync();
+
+        var planes = await query
+            .OrderBy(p => p.Id)
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        int totalPaginas = (int)Math.Ceiling(totalPlanes / (double)pageSize);
+
+        return (planes, totalPaginas);
     }
+
 
     public async Task<PlanesConcesionarium?> ObtenerPorIdAsync(int id)
     {
@@ -42,6 +54,80 @@ public class PlanesConcesionariaRepository : GenericRepository<PlanesConcesionar
         }
     }
 
+    public async Task<IEnumerable<PlanesConcesionarium>> ObtenerTodosAsync()
+    {
+        try
+        {
+            return await _context.PlanesConcesionaria
+                .Include(p => p.ContratosPlanes)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al obtener los planes de concesionaria", ex);
+        }
+    }
+
+    public async Task<PlanesConcesionarium> GetPlanByIdAsync(int id)
+    {
+        try
+        {
+            return await _context.PlanesConcesionaria
+                .Include(p => p.ContratosPlanes)
+                .FirstOrDefaultAsync(p => p.Id == id);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al obtener el plan con ID {id}", ex);
+        }
+    }
+
+    public async Task CreatePlanAsync(PlanesConcesionarium plan)
+    {
+        try
+        {
+            _context.PlanesConcesionaria.Add(plan);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al crear el plan", ex);
+        }
+    }
+
+    public async Task UpdatePlanAsync(PlanesConcesionarium plan)
+    {
+        try
+        {
+            _context.PlanesConcesionaria.Update(plan);
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al actualizar el plan con ID {plan.Id}", ex);
+        }
+    }
+
+    public async Task DeletePlanAsync(int id)
+    {
+        try
+        {
+            var plan = await _context.PlanesConcesionaria.FindAsync(id);
+            if (plan != null)
+            {
+                _context.PlanesConcesionaria.Remove(plan);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                throw new Exception($"No se encontró el plan con ID {id}");
+            }
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al eliminar el plan con ID {id}", ex);
+        }
+    }
     public IQueryable<PlanesConcesionarium> GetQueryable()
     {
         return _context.PlanesConcesionaria.AsQueryable();

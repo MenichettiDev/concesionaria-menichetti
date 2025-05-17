@@ -24,6 +24,8 @@ public partial class ConcesionariaContext : DbContext
 
     public virtual DbSet<ContratosPlane> ContratosPlanes { get; set; }
 
+    public virtual DbSet<ContratosSuscripcion> ContratosSuscripcions { get; set; }
+
     public virtual DbSet<Destacado> Destacados { get; set; }
 
     public virtual DbSet<EmpleadosConcesionarium> EmpleadosConcesionaria { get; set; }
@@ -167,6 +169,35 @@ public partial class ConcesionariaContext : DbContext
             entity.HasOne(d => d.Plan).WithMany(p => p.ContratosPlanes)
                 .HasForeignKey(d => d.PlanId)
                 .HasConstraintName("contratos_planes_ibfk_2");
+        });
+
+        modelBuilder.Entity<ContratosSuscripcion>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("contratos_suscripcion");
+
+            entity.HasIndex(e => e.SuscripcionId, "suscripcionId");
+
+            entity.HasIndex(e => e.UsuarioId, "usuarioId");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Activo)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("activo");
+            entity.Property(e => e.FechaFin).HasColumnName("fechaFin");
+            entity.Property(e => e.FechaInicio).HasColumnName("fechaInicio");
+            entity.Property(e => e.SuscripcionId).HasColumnName("suscripcionId");
+            entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
+
+            entity.HasOne(d => d.Suscripcion).WithMany(p => p.ContratosSuscripcions)
+                .HasForeignKey(d => d.SuscripcionId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("contratos_suscripcion_ibfk_2");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.ContratosSuscripcions)
+                .HasForeignKey(d => d.UsuarioId)
+                .HasConstraintName("contratos_suscripcion_ibfk_1");
         });
 
         modelBuilder.Entity<Destacado>(entity =>
@@ -381,17 +412,17 @@ public partial class ConcesionariaContext : DbContext
 
             entity.ToTable("suscripciones");
 
-            entity.HasIndex(e => e.UsuarioId, "usuarioId");
-
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Activa).HasColumnName("activa");
-            entity.Property(e => e.FechaFin).HasColumnName("fechaFin");
-            entity.Property(e => e.FechaInicio).HasColumnName("fechaInicio");
-            entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
-
-            entity.HasOne(d => d.Usuario).WithMany(p => p.Suscripciones)
-                .HasForeignKey(d => d.UsuarioId)
-                .HasConstraintName("suscripciones_ibfk_1");
+            entity.Property(e => e.CantidadPublicaciones).HasColumnName("cantidad_publicaciones");
+            entity.Property(e => e.Descripcion)
+                .HasMaxLength(200)
+                .HasColumnName("descripcion");
+            entity.Property(e => e.Nombre)
+                .HasMaxLength(50)
+                .HasColumnName("nombre");
+            entity.Property(e => e.Precio)
+                .HasPrecision(10, 2)
+                .HasColumnName("precio");
         });
 
         modelBuilder.Entity<Usuario>(entity =>

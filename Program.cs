@@ -76,6 +76,7 @@ builder.Services.AddScoped<VehiculoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<ConcesionariaRepository>();
 builder.Services.AddScoped<PlanesConcesionariaRepository>();
+builder.Services.AddScoped<SuscripcionesRepository>();
 
 
 //Agregar el contexto de la base de datos a la inyección de dependencias

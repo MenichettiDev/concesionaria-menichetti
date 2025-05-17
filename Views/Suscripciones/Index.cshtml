@@ -1,0 +1,144 @@
+@model IEnumerable<concesionaria_menichetti.Models.Suscripcione>
+
+@{
+    ViewData["Title"] = "Suscripciones usuario";
+}
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["SuccessMessage"]',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+                popup: 'rounded shadow'
+            }
+        });
+    </script>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<h1 class="mb-4"><i class="bi bi-list-ul"></i> Suscripciones Disponibles</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-success">
+        <i class="bi bi-plus-circle-fill"></i> Crear Nueva Suscripcion
+    </a>
+</p>
+
+<!-- Formulario de búsqueda por nombre -->
+<form asp-action="Index" method="get" class="row g-3 mb-3">
+    <div class="col-auto">
+        <input type="text" name="nombre" value="@Context.Request.Query["nombre"]" class="form-control"
+            placeholder="Buscar por nombre" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-search"></i> Buscar
+        </button>
+    </div>
+</form>
+
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center">
+        <i class="bi bi-info-circle-fill"></i> No hay Suscripciones disponibles.
+    </div>
+}
+else
+{
+    <table class="table table-bordered table-hover shadow-sm align-middle bg-white table-striped">
+        <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Publicaciones</th>
+                <th><i class="bi bi-gear-fill"></i> Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plan in Model)
+            {
+                <tr>
+                    <td>@plan.Id</td>
+                    <td>@plan.Nombre</td>
+                    <td>$@plan.Precio</td>
+                    <td>@plan.CantidadPublicaciones</td>
+                    <td class="text-nowrap">
+                        <a asp-action="Details" asp-route-id="@plan.Id" class="btn btn-outline-info btn-sm" title="Detalles">
+                            <i class="bi bi-info-circle-fill"></i>
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline-warning btn-sm" title="Editar">
+                            <i class="bi bi-pencil-square"></i>
+                        </a>
+                        <button type="button" class="btn btn-outline-danger btn-sm" data-bs-toggle="modal"
+                            data-bs-target="#modalEliminar" data-id="@plan.Id" data-nombre="@plan.Nombre">
+                            <i class="bi bi-trash-fill"></i>
+                        </button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<!-- Paginación -->
+@if (ViewBag.TotalPaginas > 1)
+{
+    <nav aria-label="Paginación">
+        <ul class="pagination justify-content-center mt-4">
+            @for (int i = 1; i <= ViewBag.TotalPaginas; i++)
+            {
+                <li class="page-item @(ViewBag.PaginaActual == i ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-page="@i"
+                        asp-route-nombre="@Context.Request.Query["nombre"]">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+}
+
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="modalEliminar" tabindex="-1" aria-labelledby="modalEliminarLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" asp-action="DeleteConfirmed">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="modalEliminarLabel">Confirmar Eliminación</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="Id" id="planId" />
+                    ¿Estás seguro que deseas eliminar la suscripcion? <strong id="planNombre"></strong>?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">Eliminar</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const modalEliminar = document.getElementById('modalEliminar');
+        modalEliminar.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const id = button.getAttribute('data-id');
+            const nombre = button.getAttribute('data-nombre') || 'Sin nombre';
+
+            document.getElementById('planId').value = id;
+            document.getElementById('planNombre').textContent = nombre;
+        });
+    </script>
+}

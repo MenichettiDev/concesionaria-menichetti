@@ -35,6 +35,8 @@ public partial class Usuario
 
     public virtual ICollection<Concesionaria> Concesionaria { get; set; } = new List<Concesionaria>();
 
+    public virtual ICollection<ContratosSuscripcion> ContratosSuscripcions { get; set; } = new List<ContratosSuscripcion>();
+
     public virtual ICollection<EmpleadosConcesionarium> EmpleadosConcesionaria { get; set; } = new List<EmpleadosConcesionarium>();
 
     public virtual ICollection<Favorito> Favoritos { get; set; } = new List<Favorito>();
@@ -42,8 +44,6 @@ public partial class Usuario
     public virtual ICollection<Pago> Pagos { get; set; } = new List<Pago>();
 
     public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();
-
-    public virtual ICollection<Suscripcione> Suscripciones { get; set; } = new List<Suscripcione>();
 
     public virtual ICollection<Vehiculo> Vehiculos { get; set; } = new List<Vehiculo>();
 }

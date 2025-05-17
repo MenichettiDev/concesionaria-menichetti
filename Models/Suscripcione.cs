@@ -7,13 +7,13 @@ public partial class Suscripcione
 {
     public int Id { get; set; }
 
-    public int? UsuarioId { get; set; }
+    public string Nombre { get; set; } = null!;
 
-    public DateOnly? FechaInicio { get; set; }
+    public decimal? Precio { get; set; }
 
-    public DateOnly? FechaFin { get; set; }
+    public string Descripcion { get; set; } = null!;
 
-    public bool? Activa { get; set; }
+    public int CantidadPublicaciones { get; set; }
 
-    public virtual Usuario? Usuario { get; set; }
+    public virtual ICollection<ContratosSuscripcion> ContratosSuscripcions { get; set; } = new List<ContratosSuscripcion>();
 }

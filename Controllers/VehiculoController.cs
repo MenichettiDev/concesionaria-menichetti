@@ -14,7 +14,7 @@ namespace ConcesionariaApp.Controllers
             _vehiculoRepository = vehiculoRepository;
         }
 
-        public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page = 1)
+        public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado = 1, int page = 1)
         {
             try
             {
@@ -60,7 +60,7 @@ namespace ConcesionariaApp.Controllers
 
             try
             {
-                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id.Value);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsyncConFoto(id.Value);
                 if (vehiculo == null) return NotFound();
                 return View(vehiculo);
             }
@@ -97,23 +97,32 @@ namespace ConcesionariaApp.Controllers
             return View();
         }
 
+
         [HttpPost]
-        // [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Vehiculo vehiculo)
+        public async Task<IActionResult> Create([FromForm] Vehiculo vehiculo, List<IFormFile> Imagenes)
         {
             try
             {
+                // Validar modelo si usás DataAnnotations
+                // if (!ModelState.IsValid)
+                // {
+                //     return View(vehiculo);
+                // }
 
-                await _vehiculoRepository.CreateVehiculoAsync(vehiculo);
-                TempData["SuccessMessage"] = "Vehiculo creado correctamente.";
+                // ✅ Nuevo método con transacción completa
+                await _vehiculoRepository.CreateVehiculoConFotosAsync(vehiculo, Imagenes);
+
+                TempData["SuccessMessage"] = "Vehículo creado correctamente.";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Ocurrio un error al crear el vehiculo: {ex.Message}";
+                ViewBag.ErrorMessage = $"Ocurrió un error al crear el vehículo: {ex.Message}";
                 return View(vehiculo);
             }
         }
+
+
 
         public async Task<IActionResult> Edit(int? id)
         {

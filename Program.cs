@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using concesionaria_menichetti.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
+using concesionaria_menichetti.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -72,11 +73,17 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("Administrador", policy => policy.RequireRole("Administrador"));
 });
 
+//logs
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
+
+
 builder.Services.AddScoped<VehiculoRepository>();
 builder.Services.AddScoped<UsuarioRepository>();
 builder.Services.AddScoped<ConcesionariaRepository>();
 builder.Services.AddScoped<PlanesConcesionariaRepository>();
 builder.Services.AddScoped<SuscripcionesRepository>();
+builder.Services.AddScoped<FotosVehiculoRepository>();
 
 
 //Agregar el contexto de la base de datos a la inyección de dependencias
@@ -104,6 +111,7 @@ app.UseRouting();
 // Habilitar autenticación
 app.UseAuthentication();
 app.UseAuthorization();
+
 
 app.MapControllerRoute(
     name: "default",

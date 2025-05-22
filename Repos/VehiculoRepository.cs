@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 public class VehiculoRepository
 {
     private readonly ConcesionariaContext _context;
+    private readonly ILogger<VehiculoRepository> _logger;
 
-    public VehiculoRepository(ConcesionariaContext context)
+    public VehiculoRepository(ConcesionariaContext context, ILogger<VehiculoRepository> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public IQueryable<Vehiculo> GetQueryable()
@@ -96,6 +98,23 @@ public class VehiculoRepository
         }
     }
 
+    public async Task<Vehiculo> GetVehiculoByIdAsyncConFoto(int id)
+    {
+        try
+        {
+            return await _context.Vehiculos
+                .Include(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
+                .Include(v => v.FotosVehiculos) // 👈 Agregamos esto
+                .FirstOrDefaultAsync(v => v.Id == id);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al obtener el vehículo con ID {id}", ex);
+        }
+    }
+
+
     public async Task CreateVehiculoAsync(Vehiculo vehiculo)
     {
         try
@@ -108,6 +127,77 @@ public class VehiculoRepository
             throw new Exception("Error al crear el vehículo", ex);
         }
     }
+
+    public async Task CreateVehiculoConFotosAsync(Vehiculo vehiculo, List<IFormFile> imagenes)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        var rutasImagenesGuardadas = new List<string>();
+
+        try
+        {
+            _context.Vehiculos.Add(vehiculo);
+            await _context.SaveChangesAsync();
+
+            if (imagenes != null && imagenes.Count > 0)
+            {
+                var uploadsPath = Path.Combine("wwwroot", "uploads");
+
+                // Crear la carpeta si no existe
+                if (!Directory.Exists(uploadsPath))
+                {
+                    Directory.CreateDirectory(uploadsPath);
+                }
+
+
+                foreach (var archivo in imagenes)
+                {
+                    if (archivo.Length > 0)
+                    {
+                        var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(archivo.FileName);
+                        var ruta = Path.Combine(uploadsPath, nombreArchivo);
+
+                        using (var stream = new FileStream(ruta, FileMode.Create))
+                        {
+                            await archivo.CopyToAsync(stream);
+                        }
+
+                        rutasImagenesGuardadas.Add(ruta);
+
+                        var foto = new FotosVehiculo
+                        {
+                            VehiculoId = vehiculo.Id,
+                            FotoArchivo = "/uploads/" + nombreArchivo,
+                            Fecha = DateTime.Now
+                        };
+
+                        _context.FotosVehiculos.Add(foto);
+                    }
+                }
+            }
+            else
+            {
+            }
+
+            await _context.SaveChangesAsync();
+            await transaction.CommitAsync();
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+
+            foreach (var ruta in rutasImagenesGuardadas)
+            {
+                if (File.Exists(ruta))
+                {
+                    File.Delete(ruta);
+                }
+            }
+
+            throw new Exception("Error al crear vehículo con fotos", ex);
+        }
+    }
+
+
 
     public async Task UpdateVehiculoAsync(Vehiculo vehiculo)
     {
@@ -187,6 +277,12 @@ public class VehiculoRepository
         }
     }
 
-
+    public async Task AgregarFotoVehiculoAsync(FotosVehiculo foto)
+    {
+        {
+            _context.FotosVehiculos.Add(foto);
+            await _context.SaveChangesAsync();
+        }
+    }
 
 }

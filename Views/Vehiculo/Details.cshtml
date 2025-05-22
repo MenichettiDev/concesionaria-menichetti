@@ -1,3 +1,5 @@
+<link rel="stylesheet" href="@Url.Content("~/css/vehiculos-detalles.css")" />
+
 @model Vehiculo
 
 @{
@@ -37,3 +39,114 @@
 <a href="@Url.Action("Index", "Vehiculo")" class="btn btn-outline-secondary">
     <i class="bi bi-arrow-left"></i> Volver al listado
 </a>
+
+@if (Model.FotosVehiculos != null && Model.FotosVehiculos.Any())
+{
+    <h4 class="mt-5 mb-3 text-center">Imágenes del Vehículo</h4>
+
+    <div class="gallery-container mx-auto">
+        <div class="gallery-main">
+            @for (int i = 0; i < Model.FotosVehiculos.Count; i++)
+            {
+                var foto = Model.FotosVehiculos.ElementAt(i);
+                <img src="@foto.FotoArchivo" class="gallery-slide @(i == 0 ? "active" : "")" alt="Foto vehículo" />
+            }
+
+            <button class="gallery-prev" aria-label="Foto anterior">&#10094;</button>
+            <button class="gallery-next" aria-label="Foto siguiente">&#10095;</button>
+        </div>
+
+        <div class="gallery-thumbs mt-3 d-flex justify-content-center gap-2">
+            @for (int i = 0; i < Model.FotosVehiculos.Count; i++)
+            {
+                var foto = Model.FotosVehiculos.ElementAt(i);
+                <img src="@foto.FotoArchivo" class="gallery-thumb @(i == 0 ? "selected" : "")" data-index="@i"
+                    alt="Miniatura vehículo" />
+            }
+        </div>
+    </div>
+}
+
+
+<!-- Modal personalizado funcional -->
+<div id="imageModal" class="modal">
+    <span class="modal-close" aria-label="Cerrar">&times;</span>
+    <img class="modal-content" id="modalImage" alt="Imagen ampliada" />
+    <div id="caption"></div>
+</div>
+
+
+
+@section Scripts {
+    <script>
+
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // Variables existentes para la galería
+            const slides = document.querySelectorAll('.gallery-slide');
+            const thumbs = document.querySelectorAll('.gallery-thumb');
+            const prevBtn = document.querySelector('.gallery-prev');
+            const nextBtn = document.querySelector('.gallery-next');
+            let currentIndex = 0;
+
+            function showSlide(index) {
+                if (index < 0) index = slides.length - 1;
+                if (index >= slides.length) index = 0;
+
+                slides.forEach((slide, i) => {
+                    slide.classList.toggle('active', i === index);
+                });
+                thumbs.forEach((thumb, i) => {
+                    thumb.classList.toggle('selected', i === index);
+                });
+
+                currentIndex = index;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                showSlide(currentIndex - 1);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                showSlide(currentIndex + 1);
+            });
+
+            thumbs.forEach(thumb => {
+                thumb.addEventListener('click', () => {
+                    const idx = parseInt(thumb.getAttribute('data-index'));
+                    showSlide(idx);
+                });
+            });
+
+            // --- Modal code ---
+
+            const modal = document.getElementById('imageModal');
+            const modalImg = document.getElementById('modalImage');
+            const captionText = document.getElementById('caption');
+            const modalClose = document.querySelector('.modal-close');
+
+            slides.forEach((slide, i) => {
+                slide.style.cursor = 'pointer';
+                slide.addEventListener('click', () => {
+                    modal.style.display = 'block';
+                    modalImg.src = slide.src;
+                    captionText.textContent = slide.alt || `Foto ${i + 1}`;
+                });
+            });
+
+            modalClose.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            // Cerrar modal si clickeas fuera de la imagen
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            // Inicializa mostrando la primera slide
+            showSlide(0);
+        });
+    </script>
+}

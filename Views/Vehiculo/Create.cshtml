@@ -21,66 +21,85 @@
 
 <h1>@ViewData["Title"]</h1>
 
-
 <div id="vue-app">
-    <form asp-action="Create" method="post">
+    <form method="post" asp-action="Create" enctype="multipart/form-data">
 
-        <div class="form-group">
-            <label for="Marca">Marca</label>
-            <select v-model="marca" class="form-control" name="IdMarca" required>
-                <option value="">Seleccionar marca</option>
-                <option v-for="m in marcas" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
-            </select>
+        <div class="container mt-5">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label for="Marca">Marca</label>
+                        <select v-model="marca" class="form-control" required>
+                            <option value="">Seleccionar marca</option>
+                            <option v-for="m in marcas" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Modelo">Modelo</label>
+                        <select v-model="modelo" class="form-control" required>
+                            <option value="">Seleccionar modelo</option>
+                            <option v-for="m in modelosFiltrados" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Anio">Año</label>
+                        <select v-model="ano" class="form-control" required>
+                            <option value="">Seleccionar año</option>
+                            <option v-for="anio in anios" :key="anio" :value="anio">{{ anio }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Precio">Precio</label>
+                        <input type="number" class="form-control" id="Precio" step="0.01" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Kilometraje">Kilometraje</label>
+                        <input type="number" class="form-control" id="Kilometraje" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Combustible">Combustible</label>
+                        <select class="form-control" id="Combustible" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Nafta">Nafta</option>
+                            <option value="Nafta/ GNC">Nafta/ GNC</option>
+                            <option value="Gasoil">Gasoil</option>
+                        </select>
+                    </div>
+
+                    <button type="button" class="btn btn-primary mt-2" @@click="guardarVehiculo">Guardar</button>
+                </div>
+
+                <div class="col-md-6">
+                    <h4>Imágenes del Vehículo</h4>
+
+                    <div class="form-group">
+                        <label for="ImagenesVehiculo">Seleccionar imágenes</label>
+                        <input type="file" class="form-control-file" id="Imagenes" name="Imagenes"
+                            @@change="handleFiles" accept="image/*" multiple>
+
+                    </div>
+
+                    <div class="mt-3">
+                        <h6>Previsualización:</h6>
+                        <div class="d-flex flex-wrap">
+                            <div v-for="(img, index) in imagenes" :key="index" class="position-relative m-2">
+                                <img :src="img.url" class="img-thumbnail"
+                                    style="max-width: 150px; max-height: 150px;" />
+                                <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                    style="top: 0; right: 0;" @@click="eliminarImagen(index)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-        <div class="form-group">
-            <label for="Modelo">Modelo</label>
-            <select v-model="modelo" class="form-control" name="IdModelo" required>
-                <option value="">Seleccionar modelo</option>
-                <option v-for="m in modelosFiltrados" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label for="Anio">Año</label>
-            <select v-model="ano" class="form-control" name="Anio" required>
-                <option value="">Seleccionar año</option>
-                <option v-for="anio in anios" :key="anio" :value="anio">{{ anio }}</option>
-            </select>
-
-        </div>
-
-        <div class="form-group">
-            <label for="Precio">Precio</label>
-            <input type="number" class="form-control" id="Precio" name="Precio" step="0.01" required />
-        </div>
-
-        <div class="form-group">
-            <label for="Kilometraje">Kilometraje</label>
-            <input type="number" class="form-control" id="Kilometraje" name="Kilometraje" required />
-        </div>
-
-        <div class="form-group">
-            <label for="Combustible">Combustible</label>
-            <select class="form-control" id="Combustible" name="Combustible" required>
-                <option value="">Seleccionar tipo</option>
-                <option value="Nafta">Nafta</option>
-                <option value="Nafta/ GNC">Nafta/ GNC</option>
-                <option value="Gasoil">Gasoil</option>
-            </select>
-        </div>
-
-
-        @* <div class="form-group">
-            <label for="Estado">Estado</label>
-            <select class="form-control" id="Estado" name="Estado">
-                <option value="1">Activo</option>
-                <option value="0">Inactivo</option>
-            </select>
-        </div> *@
-
-
-        <button type="submit" class="btn btn-primary mt-2">Guardar</button>
     </form>
 </div>
 
@@ -95,14 +114,67 @@
                 modelos: @Html.Raw(JsonConvert.SerializeObject(ViewBag.Modelos)),
                 ano: '',
                 anios: Array.from({ length: 20 }, (_, i) => new Date().getFullYear() - i),
+                imagenes: []
             },
             computed: {
                 modelosFiltrados() {
-                    // Filtra los modelos según la marca seleccionada
                     if (this.marca) {
                         return this.modelos.filter(m => m.idMarca === parseInt(this.marca));
                     }
                     return [];
+                }
+            },
+            methods: {
+                handleFiles(event) {
+                    const files = event.target.files;
+                    this.imagenes = [];
+
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.imagenes.push({
+                                file: file,
+                                url: e.target.result
+                            });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                },
+                eliminarImagen(index) {
+                    this.imagenes.splice(index, 1);
+                },
+                guardarVehiculo() {
+                    const formData = new FormData();
+
+                    formData.append('Vehiculo.IdMarca', this.marca);
+                    formData.append('Vehiculo.IdModelo', this.modelo);
+                    formData.append('Vehiculo.Anio', this.ano);
+                    formData.append('Vehiculo.Precio', document.getElementById('Precio').value);
+                    formData.append('Vehiculo.Kilometraje', document.getElementById('Kilometraje').value);
+                    formData.append('Vehiculo.Combustible', document.getElementById('Combustible').value);
+
+                    this.imagenes.forEach((img) => {
+                        formData.append('Imagenes', img.file);
+                    });
+
+                    fetch('/Vehiculo/Create', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(async response => {
+                            if (response.ok) {
+                                alert('Vehículo guardado exitosamente.');
+                                window.location.href = '/Vehiculo/Index';
+                            } else {
+                                const text = await response.text();
+                                console.error('Respuesta del servidor:', text);
+                                alert('Error al guardar. Verificá los datos.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error en la solicitud:', err);
+                            alert('Error inesperado al enviar el formulario.');
+                        });
                 }
             }
         });

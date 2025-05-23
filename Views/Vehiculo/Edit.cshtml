@@ -1,8 +1,13 @@
+@using Newtonsoft.Json
 @model Vehiculo
 
 @{
     ViewData["Title"] = "Editar Vehículo";
+    var marcas = ViewBag.Marcas;
+    var modelos = ViewBag.Modelos;
 }
+
+<h1>@ViewData["Title"]</h1>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -13,81 +18,176 @@
     <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
 }
 
+<div id="vue-app">
+    <form method="post" asp-action="Edit" enctype="multipart/form-data">
 
-<h1>@ViewData["Title"]</h1>
+        <input type="hidden" id="IdVehiculo" value="@Model.Id" />
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="Id" />
-    <div class="form-group">
-        <label for="Marca">Marca</label>
-        <input type="text" class="form-control" asp-for="Modelo.Marca.Descripcion" required readonly />
-    </div>
-    <div class="form-group">
-        <label for="Modelo">Modelo</label>
-        <input type="text" class="form-control" asp-for="Modelo.Descripcion" required readonly />
-    </div>
-    <div class="form-group">
-        <label for="Anio">Año</label>
-        <select asp-for="Anio" class="form-control" required>
-            <option value="">Seleccionar año</option>
-            @{
-                var currentYear = DateTime.Now.Year;
-                for (int i = 0; i < 35; i++)
-                {
-                    var year = currentYear - i;
-                    if (Model.Anio == year)
-                    {
-                        <option value="@year" selected>@year</option>
-                    }
-                    else
-                    {
-                        <option value="@year">@year</option>
-                    }
-                }
-            }
-        </select>
-    </div>
-    <div class="form-group">
-        <label for="Precio">Precio</label>
-        <input type="number" class="form-control" asp-for="Precio" step="0.01" required />
-    </div>
+        <div class="container mt-4">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                        <label>Marca</label>
+                        <input type="text" class="form-control" value="@Model.Modelo?.Marca?.Descripcion" readonly />
+                    </div>
 
-    <div class="form-group">
-        <label for="Kilometraje">Kilometraje</label>
-        <input type="number" class="form-control" asp-for="Kilometraje" required />
-    </div>
+                    <div class="form-group">
+                        <label>Modelo</label>
+                        <input type="text" class="form-control" value="@Model.Modelo?.Descripcion" readonly />
+                        <input type="hidden" name="IdModelo" :value="idModelo" />
 
-    <div class="form-group">
-        <label for="Combustible">Combustible</label>
-        <select class="form-control" asp-for="Combustible" required>
-            <option value="">Seleccionar tipo</option>
-            <option value="Nafta">Nafta</option>
-            <option value="Nafta/ GNC">Nafta/ GNC</option>
-            <option value="Gasoil">Gasoil</option>
-        </select>
-    </div>
+                    </div>
 
-    <div class="form-group">
-        <div class="form-group">
-            <label>Estado</label>
-            <input type="text" class="form-control" value="@(Model.Estado == 1 ? "Activo" : "Inactivo")" readonly />
+                    <div class="form-group">
+                        <label>Año</label>
+                        <select v-model="ano" class="form-control" required>
+                            <option value="">Seleccionar año</option>
+                            <option v-for="y in anios" :value="y">{{ y }}</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Precio</label>
+                        <input type="number" class="form-control" v-model="precio" step="0.01" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Kilometraje</label>
+                        <input type="number" class="form-control" v-model="kilometraje" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label>Combustible</label>
+                        <select class="form-control" v-model="combustible" required>
+                            <option value="">Seleccionar tipo</option>
+                            <option value="Nafta">Nafta</option>
+                            <option value="Nafta/ GNC">Nafta/ GNC</option>
+                            <option value="Gasoil">Gasoil</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Estado</label>
+                        <input type="text" class="form-control" :value="estado === 1 ? 'Activo' : 'Inactivo'"
+                            readonly />
+                    </div>
+
+                    <button type="button" class="btn btn-primary mt-2" @@click="guardarVehiculo">Guardar</button>
+                    <a href="@Url.Action("Index", "Vehiculo")" class="btn btn-secondary mt-2">Volver</a>
+                </div>
+
+                <div class="col-md-6">
+                    <h4>Imágenes actuales</h4>
+                    <div class="d-flex flex-wrap">
+                        @foreach (var foto in Model.FotosVehiculos ?? new List<FotosVehiculo>())
+                        {
+                            <div class="position-relative m-2">
+                                <img src="@foto.FotoArchivo" class="img-thumbnail" style="max-width: 150px;" />
+                                <div class="form-check mt-1 text-center">
+                                    <input class="form-check-input" type="checkbox" name="FotosAEliminar"
+                                        value="@foto.Id" />
+                                    <label class="form-check-label text-danger">Eliminar</label>
+                                </div>
+                            </div>
+                        }
+                    </div>
+
+
+                    <hr />
+                    <h5>Nuevas Imágenes</h5>
+                    <input type="file" class="form-control-file" id="Imagenes" name="Imagenes" @@change="handleFiles"
+                        accept="image/*" multiple />
+
+                    <div class="mt-3">
+                        <div class="d-flex flex-wrap">
+                            <div v-for="(img, index) in imagenes" :key="index" class="position-relative m-2">
+                                <img :src="img.url" class="img-thumbnail" style="max-width: 150px;" />
+                                <button type="button" class="btn btn-danger btn-sm position-absolute"
+                                    style="top: 0; right: 0;" @@click="eliminarImagen(index)">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-
-    </div>
-    <div class="mt-3">
-        <a href="@Url.Action("Index", "Vehiculo")" class="btn btn-secondary">Volver al listado</a>
-        <button type="submit" class="btn btn-primary">Guardar</button>
-    </div>
-</form>
+    </form>
+</div>
 
 @section Scripts {
     <script>
         new Vue({
-            el: '#idEstado  ',
+            el: '#vue-app',
             data: {
-                estado: @Model.Estado  // Si lo estás pasando desde Razor
-                                                                            }
-        })
-    </script>
+                idModelo: @Model.IdModelo,
+                ano: @Model.Anio,
+                precio: @Model.Precio,
+                kilometraje: @Model.Kilometraje,
+                combustible: '@Model.Combustible',
+                estado: @Model.Estado,
+                imagenes: [],
+                anios: Array.from({ length: 35 }, (_, i) => new Date().getFullYear() - i)
+            },
+            methods: {
+                handleFiles(event) {
+                    const files = event.target.files;
+                    this.imagenes = [];
 
+                    Array.from(files).forEach(file => {
+                        const reader = new FileReader();
+                        reader.onload = (e) => {
+                            this.imagenes.push({ file: file, url: e.target.result });
+                        };
+                        reader.readAsDataURL(file);
+                    });
+                },
+                eliminarImagen(index) {
+                    this.imagenes.splice(index, 1);
+                },
+                guardarVehiculo() {
+                    const formData = new FormData();
+                    const vehiculoId = document.getElementById('IdVehiculo').value;
+
+                    // Agregar fotos marcadas para eliminar
+                    document.querySelectorAll('input[name="FotosAEliminar"]:checked').forEach(cb => {
+                        formData.append('FotosAEliminar', cb.value);
+                    });
+
+
+                    formData.append('Id', vehiculoId);
+                    formData.append('Anio', this.ano);
+                    formData.append('Precio', this.precio);
+                    formData.append('Kilometraje', this.kilometraje);
+                    formData.append('Combustible', this.combustible);
+                    formData.append('Estado', this.estado);
+                    formData.append('IdModelo', this.idModelo);
+
+
+                    this.imagenes.forEach((img) => {
+                        formData.append('Imagenes', img.file);
+                    });
+
+                    fetch('/Vehiculo/Edit', {
+                        method: 'POST',
+                        body: formData
+                    })
+                        .then(async response => {
+                            if (response.ok) {
+                                alert('Vehículo editado correctamente.');
+                                window.location.href = '/Vehiculo/Index';
+                            } else {
+                                const text = await response.text();
+                                console.error('Error de servidor:', text);
+                                alert('Ocurrió un error al editar.');
+                            }
+                        })
+                        .catch(err => {
+                            console.error('Error:', err);
+                            alert('Error inesperado.');
+                        });
+                }
+            }
+        });
+    </script>
 }

@@ -8,9 +8,11 @@ namespace ConcesionariaApp.Controllers
     public class VehiculoController : Controller
     {
         private readonly VehiculoRepository _vehiculoRepository;
+        private readonly ILogger<VehiculoController> _logger;
 
-        public VehiculoController(VehiculoRepository vehiculoRepository)
+        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository)
         {
+            _logger = logger;
             _vehiculoRepository = vehiculoRepository;
         }
 
@@ -130,42 +132,69 @@ namespace ConcesionariaApp.Controllers
 
             try
             {
-                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id.Value);
+                var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsyncConFoto(id.Value);
                 if (vehiculo == null) return NotFound();
+
+                // También podrías cargar ViewBag.Marcas y Modelos si luego los usás en Vue para alguna edición dinámica
+                var marcas = await _vehiculoRepository.GetMarcasAsync();
+                var modelos = await _vehiculoRepository.GetModelosAsync();
+
+                ViewBag.Marcas = marcas.Select(m => new { id = m.Id, descripcion = m.Descripcion }).ToList();
+                ViewBag.Modelos = modelos.Select(m => new { id = m.Id, descripcion = m.Descripcion, idMarca = m.IdMarca }).ToList();
+
                 return View(vehiculo);
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al cargar el formulario de edicion: {ex.Message}";
+                ViewBag.ErrorMessage = $"Error al cargar el formulario de edición: {ex.Message}";
                 return View();
             }
         }
 
+
         [HttpPost]
-        public async Task<IActionResult> Edit(int id, Vehiculo vehiculo)
+        public async Task<IActionResult> Edit(int id, [FromForm] Vehiculo vehiculo, List<IFormFile>? Imagenes, [FromForm] List<int>? FotosAEliminar)
         {
-            if (id != vehiculo.Id) return NotFound();
+            _logger.LogInformation("Entrando a Edit: VehiculoId = {Id}", id);
+
+            if (id != vehiculo.Id)
+            {
+                _logger.LogWarning("ID de la URL ({UrlId}) no coincide con el del modelo ({ModelId})", id, vehiculo.Id);
+                return NotFound();
+            }
+
+            _logger.LogInformation("Datos del vehículo recibidos: Anio = {Anio}, Precio = {Precio}, Combustible = {Combustible}, Estado = {Estado}",
+                vehiculo.Anio, vehiculo.Precio, vehiculo.Combustible, vehiculo.Estado);
+
+            if (Imagenes != null && Imagenes.Any())
+            {
+                _logger.LogInformation("Cantidad de nuevas imágenes recibidas: {Cantidad}", Imagenes.Count);
+            }
+
+            if (FotosAEliminar != null && FotosAEliminar.Any())
+            {
+                _logger.LogInformation("IDs de imágenes marcadas para eliminar: {Ids}", string.Join(", ", FotosAEliminar));
+            }
 
             try
             {
-                if (!ModelState.IsValid)
-                {
-                    ViewBag.ErrorMessage = "Por favor revise los datos ingresados.";
-                    return View(vehiculo);
-                }
+                await _vehiculoRepository.UpdateVehiculoConFotosAsync(vehiculo, Imagenes, FotosAEliminar);
+                TempData["SuccessMessage"] = "Vehículo actualizado correctamente.";
 
-                vehiculo.UsuarioId = 1; //TODO: modificar cuando aplique login
-                vehiculo.Estado = 1;
-                await _vehiculoRepository.UpdateVehiculoAsync(vehiculo);
-                TempData["SuccessMessage"] = "Vehiculo actualizado correctamente.";
+                _logger.LogInformation("Vehículo {Id} actualizado con éxito", vehiculo.Id);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Ocurrio un error al actualizar el vehiculo: {ex.Message}";
+                _logger.LogError(ex, "Error al actualizar vehículo {Id}", vehiculo.Id);
+                ViewBag.ErrorMessage = $"Ocurrió un error al actualizar el vehículo: {ex.Message}";
                 return View(vehiculo);
             }
         }
+
+
+
+
 
         public async Task<IActionResult> Delete(int? id)
         {

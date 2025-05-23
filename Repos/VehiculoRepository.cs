@@ -212,6 +212,109 @@ public class VehiculoRepository
         }
     }
 
+    public async Task UpdateVehiculoConFotosAsync(Vehiculo vehiculo, List<IFormFile>? nuevasImagenes, List<int>? idsFotosEliminar)
+    {
+        using var transaction = await _context.Database.BeginTransactionAsync();
+        var rutasNuevasImagenesGuardadas = new List<string>();
+
+        try
+        {
+            _logger.LogInformation("Iniciando actualización del vehículo con ID: {VehiculoId}", vehiculo.Id);
+            _logger.LogInformation("ID del modelo recibido: {IdModelo}", vehiculo.IdModelo);
+
+            // 1. Actualizamos el vehículo
+            _context.Vehiculos.Update(vehiculo);
+            await _context.SaveChangesAsync();
+            _logger.LogInformation("Vehículo actualizado en base de datos.");
+
+            // 2. Eliminamos fotos seleccionadas
+            if (idsFotosEliminar != null && idsFotosEliminar.Count > 0)
+            {
+                _logger.LogInformation("Eliminando {Count} fotos del vehículo ID: {VehiculoId}", idsFotosEliminar.Count, vehiculo.Id);
+
+                var fotosAEliminar = await _context.FotosVehiculos
+                    .Where(f => idsFotosEliminar.Contains(f.Id) && f.VehiculoId == vehiculo.Id)
+                    .ToListAsync();
+
+                foreach (var foto in fotosAEliminar)
+                {
+                    var rutaFisica = Path.Combine("wwwroot", foto.FotoArchivo.TrimStart('/'));
+                    if (File.Exists(rutaFisica))
+                    {
+                        File.Delete(rutaFisica);
+                        _logger.LogInformation("Archivo eliminado: {Ruta}", rutaFisica);
+                    }
+
+                    _context.FotosVehiculos.Remove(foto);
+                }
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Fotos eliminadas correctamente.");
+            }
+
+            // 3. Agregamos nuevas imágenes
+            if (nuevasImagenes != null && nuevasImagenes.Count > 0)
+            {
+                _logger.LogInformation("Agregando {Count} nuevas imágenes para vehículo ID: {VehiculoId}", nuevasImagenes.Count, vehiculo.Id);
+
+                var uploadsPath = Path.Combine("wwwroot", "uploads");
+                if (!Directory.Exists(uploadsPath))
+                {
+                    Directory.CreateDirectory(uploadsPath);
+                    _logger.LogInformation("Directorio creado: {Ruta}", uploadsPath);
+                }
+
+                foreach (var archivo in nuevasImagenes)
+                {
+                    if (archivo.Length > 0)
+                    {
+                        var nombreArchivo = Guid.NewGuid().ToString() + Path.GetExtension(archivo.FileName);
+                        var ruta = Path.Combine(uploadsPath, nombreArchivo);
+
+                        using (var stream = new FileStream(ruta, FileMode.Create))
+                        {
+                            await archivo.CopyToAsync(stream);
+                        }
+
+                        rutasNuevasImagenesGuardadas.Add(ruta);
+                        _logger.LogInformation("Imagen guardada en: {Ruta}", ruta);
+
+                        var nuevaFoto = new FotosVehiculo
+                        {
+                            VehiculoId = vehiculo.Id,
+                            FotoArchivo = "/uploads/" + nombreArchivo,
+                            Fecha = DateTime.Now
+                        };
+
+                        _context.FotosVehiculos.Add(nuevaFoto);
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+                _logger.LogInformation("Nuevas imágenes asociadas al vehículo correctamente.");
+            }
+
+            await transaction.CommitAsync();
+            _logger.LogInformation("Transacción completada correctamente para vehículo ID: {VehiculoId}", vehiculo.Id);
+        }
+        catch (Exception ex)
+        {
+            await transaction.RollbackAsync();
+            _logger.LogError(ex, "Error durante la actualización del vehículo con ID: {VehiculoId}", vehiculo.Id);
+
+            foreach (var ruta in rutasNuevasImagenesGuardadas)
+            {
+                if (File.Exists(ruta))
+                {
+                    File.Delete(ruta);
+                    _logger.LogInformation("Archivo eliminado tras rollback: {Ruta}", ruta);
+                }
+            }
+
+            throw new Exception($"Error al actualizar el vehículo con fotos: {ex.Message}", ex);
+        }
+    }
+
     public async Task DeleteVehiculoAsync(int id)
     {
         try

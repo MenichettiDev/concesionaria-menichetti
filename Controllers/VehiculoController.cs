@@ -46,10 +46,6 @@ namespace ConcesionariaApp.Controllers
                 ViewBag.PaginaActual = page;
                 ViewBag.TotalPaginas = result.TotalPaginas;
 
-                foreach (var vehiculo in result.Vehiculos)
-                {
-                    Console.WriteLine($"Vehículo ID: {vehiculo.Id}, Modelo: {vehiculo.Modelo}, Destacado: {vehiculo.EstaDestacado}");
-                }
 
 
                 return View(result.Vehiculos);

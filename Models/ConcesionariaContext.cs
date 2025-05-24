@@ -483,6 +483,9 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.Combustible)
                 .HasMaxLength(20)
                 .HasColumnName("combustible");
+            entity.Property(e => e.Destacado)
+                .HasComment("0 : no\r\n1: si")
+                .HasColumnName("destacado");
             entity.Property(e => e.Estado)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("estado");

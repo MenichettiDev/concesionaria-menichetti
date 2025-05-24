@@ -9,9 +9,12 @@ namespace concesionaria_menichetti.Controllers
     {
         private readonly PagoRepository _pagosRepository;
         private readonly DestacadoRepository _destacadosRepository;
+        private readonly VehiculoRepository _vehiculoRepository;
 
-        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository)
+        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository, VehiculoRepository vehiculoRepository)
+
         {
+            _vehiculoRepository = vehiculoRepository;
             _pagosRepository = pagosRepository;
             _destacadosRepository = destacadosRepository;
         }
@@ -78,10 +81,23 @@ namespace concesionaria_menichetti.Controllers
                     var VehiculoId = vehiculoId.Value;
 
                     await _destacadosRepository.MarcarVehiculoComoDestacadoAsync(VehiculoId);
+                    await _vehiculoRepository.ActualizarDestacadoAsync(VehiculoId);
+                    TempData["SuccessMessage"] = "Pago registrado y vehiculo destacado correctamente.";
+                }
+                else if (model.Tipo == "Suscripcion")
+                {
+                    TempData["SuccessMessage"] = "Pago de suscripción registrado correctamente.";
+                }
+                else if (model.Tipo == "Plan")
+                {
+                    TempData["SuccessMessage"] = "Pago de plan registrado correctamente.";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Pago registrado correctamente.";
                 }
 
 
-                TempData["SuccessMessage"] = "Pago registrado correctamente.";
                 return RedirectToAction("Index", "Vehiculo");
             }
             catch (Exception ex)

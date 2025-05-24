@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace concesionaria_menichetti.Models;
 
@@ -21,6 +20,7 @@ public partial class Vehiculo
     public string? Combustible { get; set; }
 
     public int Estado { get; set; }
+    public int Destacado { get; set; }
 
     public virtual ICollection<AccesosPagado> AccesosPagados { get; set; } = new List<AccesosPagado>();
 
@@ -35,7 +35,4 @@ public partial class Vehiculo
     public virtual ICollection<Reporte> Reportes { get; set; } = new List<Reporte>();
 
     public virtual Usuario? Usuario { get; set; }
-
-    [NotMapped]
-    public bool EstaDestacado { get; set; } = false;
 }

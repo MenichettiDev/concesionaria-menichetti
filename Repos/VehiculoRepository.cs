@@ -64,13 +64,7 @@ public class VehiculoRepository
             .Take(pageSize)
             .ToListAsync();
 
-        // Marcamos si está destacado
-        var hoy = DateTime.Today;
 
-        vehiculos.ForEach(v =>
-        {
-            v.EstaDestacado = v.Destacados.Any(d => d.FechaInicio <= hoy && (d.FechaFin == null || d.FechaFin >= hoy));
-        });
 
         int totalPaginas = (int)Math.Ceiling(totalVehiculos / (double)pageSize);
 
@@ -329,7 +323,7 @@ public class VehiculoRepository
         var vehiculo = await _context.Vehiculos.FindAsync(id);
         if (vehiculo == null)
             return false;
-
+        vehiculo.Destacado = 1;
         _context.Vehiculos.Update(vehiculo);
 
         try

@@ -22,9 +22,9 @@
             <p><strong>Combustible:</strong> @Model?.Combustible</p>
             <p>
                 <strong>Publicación destacada:</strong>
-                <span class="badge @(Model?.Destacado == true ? "bg-warning text-dark" : "bg-secondary")">
+                @* <span class="badge @(Model?.Destacado == true ? "bg-warning text-dark" : "bg-secondary")">
                     @(Model?.Destacado == true ? "Destacada" : "No destacada")
-                </span>
+                </span> *@
             </p>
             <p>
                 <strong>Estado publicación:</strong>

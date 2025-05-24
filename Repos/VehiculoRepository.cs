@@ -28,7 +28,8 @@ public class VehiculoRepository
 
         query = query
             .Include(v => v.Modelo)
-            .ThenInclude(m => m.Marca);
+            .ThenInclude(m => m.Marca)
+            .Include(v => v.Destacados);
 
 
         if (idMarca.HasValue)
@@ -62,6 +63,14 @@ public class VehiculoRepository
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
+
+        // Marcamos si está destacado
+        var hoy = DateTime.Today;
+
+        vehiculos.ForEach(v =>
+        {
+            v.EstaDestacado = v.Destacados.Any(d => d.FechaInicio <= hoy && (d.FechaFin == null || d.FechaFin >= hoy));
+        });
 
         int totalPaginas = (int)Math.Ceiling(totalVehiculos / (double)pageSize);
 
@@ -314,6 +323,27 @@ public class VehiculoRepository
             throw new Exception($"Error al actualizar el vehículo con fotos: {ex.Message}", ex);
         }
     }
+
+    public async Task<bool> ActualizarDestacadoAsync(int id)
+    {
+        var vehiculo = await _context.Vehiculos.FindAsync(id);
+        if (vehiculo == null)
+            return false;
+
+        _context.Vehiculos.Update(vehiculo);
+
+        try
+        {
+            await _context.SaveChangesAsync();
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+
 
     public async Task DeleteVehiculoAsync(int id)
     {

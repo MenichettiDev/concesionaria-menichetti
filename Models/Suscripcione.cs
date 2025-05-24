@@ -9,7 +9,7 @@ public partial class Suscripcione
 
     public string Nombre { get; set; } = null!;
 
-    public decimal? Precio { get; set; }
+    public decimal Precio { get; set; }
 
     public string Descripcion { get; set; } = null!;
 

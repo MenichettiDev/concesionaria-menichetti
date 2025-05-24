@@ -1,0 +1,46 @@
+@model concesionaria_menichetti.Models.Pago
+
+@{
+    ViewData["Title"] = "Simulación de Pago";
+}
+
+<h1 class="mb-4">@ViewData["Title"]</h1>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+}
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+<div class="card shadow p-4" style="max-width: 600px;">
+    <form asp-action="Create" method="post">
+        <div class="mb-3">
+            <label class="form-label">Tipo de Pago</label>
+            <input type="text" class="form-control" asp-for="Tipo" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Monto</label>
+            <input type="number" class="form-control" asp-for="Monto" step="0.01" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Detalle</label>
+            <textarea class="form-control" asp-for="Detalle" rows="3" readonly></textarea>
+        </div>
+
+        @if (Model.Id != 0)
+        {
+            <input type="hidden" asp-for="Id" />
+        }
+
+        <input type="hidden" name="vehiculoId" value="@ViewBag.vehiculoId" />
+
+
+        <button type="submit" class="btn btn-primary">Confirmar Pago</button>
+        <a asp-action="Index" asp-controller="Vehiculos" class="btn btn-secondary ms-2">Cancelar</a>
+    </form>
+</div>

@@ -14,6 +14,11 @@ public class PagoRepository : GenericRepository<Pago>
         _context = context;
     }
 
+    public async Task CreatePagoAsync(Pago pago)
+    {
+        _context.Pagos.Add(pago);
+        await _context.SaveChangesAsync();
+    }
     public async Task<IEnumerable<Pago>> ObtenerPagosPorUsuarioAsync(int usuarioId)
     {
         try

@@ -46,6 +46,12 @@ namespace ConcesionariaApp.Controllers
                 ViewBag.PaginaActual = page;
                 ViewBag.TotalPaginas = result.TotalPaginas;
 
+                foreach (var vehiculo in result.Vehiculos)
+                {
+                    Console.WriteLine($"Vehículo ID: {vehiculo.Id}, Modelo: {vehiculo.Modelo}, Destacado: {vehiculo.EstaDestacado}");
+                }
+
+
                 return View(result.Vehiculos);
             }
             catch (Exception ex)
@@ -105,13 +111,6 @@ namespace ConcesionariaApp.Controllers
         {
             try
             {
-                // Validar modelo si usás DataAnnotations
-                // if (!ModelState.IsValid)
-                // {
-                //     return View(vehiculo);
-                // }
-
-                // ✅ Nuevo método con transacción completa
                 await _vehiculoRepository.CreateVehiculoConFotosAsync(vehiculo, Imagenes);
 
                 TempData["SuccessMessage"] = "Vehículo creado correctamente.";
@@ -155,25 +154,19 @@ namespace ConcesionariaApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, [FromForm] Vehiculo vehiculo, List<IFormFile>? Imagenes, [FromForm] List<int>? FotosAEliminar)
         {
-            _logger.LogInformation("Entrando a Edit: VehiculoId = {Id}", id);
 
             if (id != vehiculo.Id)
             {
-                _logger.LogWarning("ID de la URL ({UrlId}) no coincide con el del modelo ({ModelId})", id, vehiculo.Id);
                 return NotFound();
             }
 
-            _logger.LogInformation("Datos del vehículo recibidos: Anio = {Anio}, Precio = {Precio}, Combustible = {Combustible}, Estado = {Estado}",
-                vehiculo.Anio, vehiculo.Precio, vehiculo.Combustible, vehiculo.Estado);
 
             if (Imagenes != null && Imagenes.Any())
             {
-                _logger.LogInformation("Cantidad de nuevas imágenes recibidas: {Cantidad}", Imagenes.Count);
             }
 
             if (FotosAEliminar != null && FotosAEliminar.Any())
             {
-                _logger.LogInformation("IDs de imágenes marcadas para eliminar: {Ids}", string.Join(", ", FotosAEliminar));
             }
 
             try
@@ -181,18 +174,35 @@ namespace ConcesionariaApp.Controllers
                 await _vehiculoRepository.UpdateVehiculoConFotosAsync(vehiculo, Imagenes, FotosAEliminar);
                 TempData["SuccessMessage"] = "Vehículo actualizado correctamente.";
 
-                _logger.LogInformation("Vehículo {Id} actualizado con éxito", vehiculo.Id);
                 return RedirectToAction("Index");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error al actualizar vehículo {Id}", vehiculo.Id);
                 ViewBag.ErrorMessage = $"Ocurrió un error al actualizar el vehículo: {ex.Message}";
                 return View(vehiculo);
             }
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Destacar(int id)
+        {
+            var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id);
+            if (vehiculo == null)
+                return NotFound();
 
+            try
+            {
+                var actualizado = await _vehiculoRepository.ActualizarDestacadoAsync(id);
+                if (actualizado)
+                    return Json(new { success = true, message = "Vehículo destacado correctamente." });
+                else
+                    return Json(new { success = false, message = "No se pudo actualizar el vehículo." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error al destacar el vehículo: {ex.Message}" });
+            }
+        }
 
 
 

@@ -10,7 +10,7 @@
     <div class="row g-4">
         <div class="col-md-6">
             <h5><strong>Nombre Suscripcion:</strong> @Model?.Nombre</h5>
-            <p><strong>Precio:</strong> $@Model?.Precio?.ToString("N2")</p>
+            <p><strong>Precio:</strong> $@Model?.Precio.ToString("N2")</p>
             <p><strong>Publicaciones Permitidas:</strong> @Model?.CantidadPublicaciones</p>
         </div>
         <div class="col-md-6">

@@ -348,12 +348,13 @@ public partial class ConcesionariaContext : DbContext
                 .HasPrecision(12, 2)
                 .HasColumnName("monto");
             entity.Property(e => e.Tipo)
-                .HasMaxLength(30)
+                .HasColumnType("enum('Suscripcion','Plan','Destacado')")
                 .HasColumnName("tipo");
             entity.Property(e => e.UsuarioId).HasColumnName("usuarioId");
 
             entity.HasOne(d => d.Usuario).WithMany(p => p.Pagos)
                 .HasForeignKey(d => d.UsuarioId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("pagos_ibfk_1");
         });
 
@@ -482,15 +483,9 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.Combustible)
                 .HasMaxLength(20)
                 .HasColumnName("combustible");
-            entity.Property(e => e.Destacado)
-                .HasDefaultValueSql("'0'")
-                .HasColumnName("destacado");
             entity.Property(e => e.Estado)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("estado");
-            entity.Property(e => e.FechaDestacado)
-                .HasColumnType("timestamp")
-                .HasColumnName("fechaDestacado");
             entity.Property(e => e.IdModelo).HasColumnName("idModelo");
             entity.Property(e => e.Kilometraje).HasColumnName("kilometraje");
             entity.Property(e => e.Precio)

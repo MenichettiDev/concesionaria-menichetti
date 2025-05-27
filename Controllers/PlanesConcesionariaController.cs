@@ -160,5 +160,26 @@ namespace ConcesionariaApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
+        public async Task<IActionResult> Contratar(string nombre, int page = 1)
+        {
+            try
+            {
+                int pageSize = 10;
+
+                var result = await _planesRepository.ObtenerPlanesFiltradosAsync(nombre, page, pageSize);
+
+                ViewBag.PaginaActual = page;
+                ViewBag.TotalPaginas = result.TotalPaginas;
+
+                return View(result.Planes);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Error al cargar los planes: {ex.Message}";
+                return View();
+            }
+        }
+
     }
 }

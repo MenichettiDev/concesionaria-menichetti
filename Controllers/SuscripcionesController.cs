@@ -160,5 +160,25 @@ namespace ConcesionariaApp.Controllers
                 return RedirectToAction(nameof(Index));
             }
         }
+
+        public async Task<IActionResult> Contratar(string nombre, int page = 1)
+        {
+            try
+            {
+                int pageSize = 10;
+
+                var result = await _suscripcionesRepository.ObtenerSuscripcionesFiltradosAsync(nombre, page, pageSize);
+
+                ViewBag.PaginaActual = page;
+                ViewBag.TotalPaginas = result.TotalPaginas;
+
+                return View(result.Suscripciones);
+            }
+            catch (Exception ex)
+            {
+                ViewBag.ErrorMessage = $"Error al cargar los Suscripciones: {ex.Message}";
+                return View();
+            }
+        }
     }
 }

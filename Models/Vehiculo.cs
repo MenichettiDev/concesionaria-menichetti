@@ -20,7 +20,10 @@ public partial class Vehiculo
     public string? Combustible { get; set; }
 
     public int Estado { get; set; }
+
     public int Destacado { get; set; }
+
+    public DateTime? FechaDestacado { get; set; }
 
     public virtual ICollection<AccesosPagado> AccesosPagados { get; set; } = new List<AccesosPagado>();
 

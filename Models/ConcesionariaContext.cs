@@ -489,6 +489,10 @@ public partial class ConcesionariaContext : DbContext
             entity.Property(e => e.Estado)
                 .HasDefaultValueSql("'1'")
                 .HasColumnName("estado");
+            entity.Property(e => e.FechaDestacado)
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
+                .HasColumnType("timestamp")
+                .HasColumnName("fecha_destacado");
             entity.Property(e => e.IdModelo).HasColumnName("idModelo");
             entity.Property(e => e.Kilometraje).HasColumnName("kilometraje");
             entity.Property(e => e.Precio)

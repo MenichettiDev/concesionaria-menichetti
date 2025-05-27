@@ -50,11 +50,11 @@ namespace concesionaria_menichetti.Controllers
             return View(model);
         }
 
-        // POST Create
+        // POST Create //en id llega el id de suscripcion, de vehiculo o de plan 
         [HttpPost]
-        public async Task<IActionResult> Create(Pago model, int? vehiculoId)
+        public async Task<IActionResult> Create(Pago model, int? Id)
         {
-
+            //obtengo id de usuario
             var userIdString = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
             if (!int.TryParse(userIdString, out int userId))
             {
@@ -75,10 +75,10 @@ namespace concesionaria_menichetti.Controllers
 
                 await _pagosRepository.CreatePagoAsync(pago);
 
-                // Console.WriteLine("vehiculoId: " + vehiculoId);
-                if (model.Tipo == "Destacado" && vehiculoId.HasValue)
+                // Console.WriteLine("vehiculoId: " + Id);
+                if (model.Tipo == "Destacado" && Id.HasValue)
                 {
-                    var VehiculoId = vehiculoId.Value;
+                    var VehiculoId = Id.Value;
 
                     await _destacadosRepository.MarcarVehiculoComoDestacadoAsync(VehiculoId);
                     await _vehiculoRepository.ActualizarDestacadoAsync(VehiculoId);

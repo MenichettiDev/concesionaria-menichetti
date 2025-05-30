@@ -14,20 +14,6 @@ public class FavoritoRepository : GenericRepository<Favorito>
         _context = context;
     }
 
-    public async Task<IEnumerable<Favorito>> ObtenerTodosAsync()
-    {
-        try
-        {
-            return await _context.Favoritos
-                .Include(f => f.Usuario)
-                .Include(f => f.Vehiculo)
-                .ToListAsync();
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error al obtener los favoritos", ex);
-        }
-    }
 
     public async Task<IEnumerable<Favorito>> ObtenerPorUsuarioIdAsync(int usuarioId)
     {
@@ -56,6 +42,39 @@ public class FavoritoRepository : GenericRepository<Favorito>
             throw new Exception($"Error al obtener el favorito para usuario ID {usuarioId} y vehículo ID {vehiculoId}", ex);
         }
     }
+
+    public async Task<bool> EsFavoritoAsync(int usuarioId, int vehiculoId)
+    {
+        return await _context.Favoritos
+            .AnyAsync(f => f.UsuarioId == usuarioId && f.VehiculoId == vehiculoId);
+    }
+
+    public async Task AgregarFavoritoAsync(int usuarioId, int vehiculoId)
+    {
+        if (!await EsFavoritoAsync(usuarioId, vehiculoId))
+        {
+            _context.Favoritos.Add(new Favorito
+            {
+                UsuarioId = usuarioId,
+                VehiculoId = vehiculoId
+            });
+
+            await _context.SaveChangesAsync();
+        }
+    }
+
+    public async Task QuitarFavoritoAsync(int usuarioId, int vehiculoId)
+    {
+        var favorito = await _context.Favoritos
+            .FirstOrDefaultAsync(f => f.UsuarioId == usuarioId && f.VehiculoId == vehiculoId);
+
+        if (favorito != null)
+        {
+            _context.Favoritos.Remove(favorito);
+            await _context.SaveChangesAsync();
+        }
+    }
+
 
     public IQueryable<Favorito> GetQueryable()
     {

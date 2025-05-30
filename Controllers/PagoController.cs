@@ -10,13 +10,21 @@ namespace concesionaria_menichetti.Controllers
         private readonly PagoRepository _pagosRepository;
         private readonly DestacadoRepository _destacadosRepository;
         private readonly VehiculoRepository _vehiculoRepository;
+        private readonly ContratoSuscripcionRepository _contratoSuscripcionRepository;
+        private readonly ContratoPlanesRepository _contratoPlanesRepository;
+        private readonly UsuarioRepository _usuarioRepository;
+        private readonly ConcesionariaRepository _concesionariaRepository;
 
-        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository, VehiculoRepository vehiculoRepository)
+        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository, VehiculoRepository vehiculoRepository, ContratoPlanesRepository contratoPlanesRepository, ContratoSuscripcionRepository contratoSuscripcionRepository, UsuarioRepository usuarioRepository, ConcesionariaRepository concesionariaRepository)
 
         {
             _vehiculoRepository = vehiculoRepository;
             _pagosRepository = pagosRepository;
             _destacadosRepository = destacadosRepository;
+            _contratoSuscripcionRepository = contratoSuscripcionRepository;
+            _contratoPlanesRepository = contratoPlanesRepository;
+            _usuarioRepository = usuarioRepository;
+            _concesionariaRepository = concesionariaRepository;
         }
 
         // GET Create
@@ -86,10 +94,20 @@ namespace concesionaria_menichetti.Controllers
                 }
                 else if (model.Tipo == "Suscripcion")
                 {
-                    TempData["SuccessMessage"] = "Pago de suscripción registrado correctamente.";
+
+                    var idSuscripcion = Id.Value;
+                    int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                    await _contratoSuscripcionRepository.CargarContratoSuscripcion(idSuscripcion, idUser);
+
+                    TempData["SuccessMessage"] = "Pago de suscripcion registrado correctamente.";
                 }
                 else if (model.Tipo == "Plan")
                 {
+                    var idPlan = Id.Value;
+                    int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                    var Concesionaria = await _concesionariaRepository.ObtenerPorUsuarioIdAsync(idUser);
+
+                    await _contratoPlanesRepository.CargarContratoPlan(idPlan, Concesionaria.Id);
                     TempData["SuccessMessage"] = "Pago de plan registrado correctamente.";
                 }
                 else

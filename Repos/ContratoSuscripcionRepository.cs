@@ -5,25 +5,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-public class ContratoPlanesRepository : GenericRepository<ContratosPlane>
+public class ContratoSuscripcionRepository : GenericRepository<Suscripcione>
 {
     private readonly ConcesionariaContext _context;
 
-    public ContratoPlanesRepository(ConcesionariaContext context) : base(context)
+    public ContratoSuscripcionRepository(ConcesionariaContext context) : base(context)
     {
         _context = context;
     }
 
-    public async Task CargarContratoPlan(int planId, int concesionariaId)
+    public async Task CargarContratoSuscripcion(int id, int idUser)
     {
-        var contratoPlan = new ContratosPlane
+        var ContratosSuscripcion = new ContratosSuscripcion
         {
-            ConcesionariaId = concesionariaId,
-            PlanId = planId, // Aquí deberías asignar un PlanId válido si es necesario
+            SuscripcionId = id,
             FechaInicio = DateOnly.FromDateTime(DateTime.Now),
             FechaFin = DateOnly.FromDateTime(DateTime.Now.AddDays(30)),
+            UsuarioId = idUser
         };
-        _context.ContratosPlanes.Add(contratoPlan);
+        _context.ContratosSuscripcions.Add(ContratosSuscripcion);
         await _context.SaveChangesAsync();
     }
 

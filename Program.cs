@@ -86,6 +86,11 @@ builder.Services.AddScoped<SuscripcionesRepository>();
 builder.Services.AddScoped<FotosVehiculoRepository>();
 builder.Services.AddScoped<PagoRepository>();
 builder.Services.AddScoped<DestacadoRepository>();
+builder.Services.AddScoped<ContratoSuscripcionRepository>();
+builder.Services.AddScoped<ContratoPlanesRepository>();
+builder.Services.AddScoped<HomeRepository>();
+builder.Services.AddScoped<FavoritoRepository>();
+
 
 
 //Agregar el contexto de la base de datos a la inyección de dependencias

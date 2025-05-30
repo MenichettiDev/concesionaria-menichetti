@@ -1,8 +1,305 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+﻿@using System.Text.Json
+@model IEnumerable<Vehiculo>
+
+    @* <p class="text-muted">
+    Usuario autenticado: @User.Identity?.IsAuthenticated<br/>
+    Claims: @string.Join(", ", User.Claims.Select(c => $"{c.Type}={c.Value}"))<br/>
+    Favoritos: @((ViewBag.FavoritosIds as List<int>)?.Count ?? 0)
+</p> *@
+
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["SuccessMessage"]',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+                popup: 'rounded shadow'
+            }
+        });
+    </script>
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
+@{
+    ViewData["Title"] = "Vehículos Activos";
+    var rnd = new Random();
+}
+
+<h1 class="mb-4"><i class="bi bi-car-front"></i>Vehículos disponibles</h1>
+
+
+
+<div id="filtros" class="mb-4 p-3 bg-light rounded shadow-sm">
+    <div class="row g-2">
+        <!-- Filtro Marca: Ahora es un select -->
+        <div class="col-md-3">
+            <label class="form-label">Marca</label>
+            <select v-model="marca" class="form-select">
+                <option value="">Seleccionar marca</option>
+                <option v-for="m in marcas" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+            </select>
+
+        </div>
+
+        <!-- Filtro Modelo: Ahora es un select -->
+        <div class="col-md-3">
+            <label class="form-label">Modelo</label>
+            <select v-model="modelo" class="form-select">
+                <option value="">Seleccionar modelo</option>
+                <option v-for="m in modelosFiltrados" :key="m.id" :value="m.id">{{ m.descripcion }}</option>
+            </select>
+        </div>
+
+
+        <!-- Filtro Año Desde -->
+        <div class="col-md-3">
+            <label class="form-label">Año desde</label>
+            <select v-model="anoDesde" class="form-select">
+                <option value="">Seleccionar año</option>
+                <option v-for="anio in anios" :key="'desde-' + anio" :value="anio">{{ anio }}</option>
+                <option value="otro">Otro...</option>
+            </select>
+        </div>
+
+        <!-- Filtro Año Hasta -->
+        <div class="col-md-3">
+            <label class="form-label">Año hasta</label>
+            <select v-model="anoHasta" class="form-select">
+                <option value="">Seleccionar año</option>
+                <option v-for="anio in anios" :key="'hasta-' + anio" :value="anio">{{ anio }}</option>
+                <option value="otro">Otro...</option>
+            </select>
+        </div>
+
+        <!-- Filtro Estado -->
+        <div class="col-md-3">
+            <label class="form-label">Estado</label>
+            <select v-model="estado" class="form-select">
+                <option value="1">Activo</option>
+                <option value="0">Inactivo</option>
+            </select>
+        </div>
+
+        <!-- Botones de Filtrar y Limpiar -->
+        <div class="col-md-3 d-flex align-items-end gap-2">
+            <button @@click="filtrar" class="btn btn-primary w-50" type="button">
+                <i class="bi bi-funnel-fill"></i> Filtrar
+            </button>
+            <button @@click="limpiarFiltros" class="btn btn-secondary w-50" type="button">
+                <i class="bi bi-x-circle"></i> Limpiar Filtros
+            </button>
+        </div>
+    </div>
 </div>
+
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info text-center shadow-sm rounded">
+        <i class="bi bi-info-circle-fill"></i> No hay vehículos publicados.
+    </div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var vehiculo in Model)
+        {
+            <div class="col">
+                    
+                <a href="@Url.Action("Details", "Home", new { id = vehiculo.Id })" class="text-decoration-none text-dark">
+                    <div class="card h-100 shadow-sm border-0 transition-card">
+                        @if (vehiculo.FotosVehiculos.Any())
+                        {
+                            var fotoUrl = vehiculo.FotosVehiculos.First().FotoArchivo;
+                            <img src="@fotoUrl" class="card-img-top rounded-top" style="height: 180px; object-fit: cover;" />
+                        }
+                        else
+                        {
+                            <div class="d-flex align-items-center justify-content-center bg-light rounded-top" style="height: 180px;">
+                                <i class="bi bi-card-image fs-1 text-secondary"></i>
+                            </div>
+                        }
+
+                        <div class="card-body">
+                            <h5 class="card-title mb-1">
+                                @vehiculo.Modelo?.Marca?.Descripcion @vehiculo.Modelo?.Descripcion
+                            </h5>
+                            <h6 class="card-subtitle text-muted mb-2">
+                                <small>Modelo: @vehiculo.Anio</small>
+                            </h6>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <span id="fav-btn-@vehiculo.Id">
+                                    <button type="button"
+                                        class="btn btn-sm @(ViewBag.FavoritosIds != null && ((List<int>)ViewBag.FavoritosIds).Contains(vehiculo.Id) ? "btn-warning" : "btn-outline-warning")"
+                                        title="Marcar como favorito"
+                                        onclick="toggleFavorito(@vehiculo.Id)">
+                                        <i class="bi @(ViewBag.FavoritosIds != null && ((List<int>)ViewBag.FavoritosIds).Contains(vehiculo.Id) ? "bi-star-fill" : "bi-star")"></i>
+                                    </button>
+                                </span>
+
+                            </div>
+                        </div>
+
+                        <div class="card-footer bg-light text-muted small">
+                            ID: @vehiculo.Id
+                        </div>
+                    </div>
+                </a>
+            </div>
+
+        }
+    </div>
+}
+
+
+
+<div class="d-flex justify-content-between mb-3">
+    <div>
+        Página @ViewBag.PaginaActual de @ViewBag.TotalPaginas
+    </div>
+    <div>
+        @if (ViewBag.PaginaActual > 1)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Index", new {
+                page = ViewBag.PaginaActual - 1,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                ano = Context.Request.Query["ano"]
+            })">
+                Anterior
+            </a>
+        }
+
+        @if (ViewBag.PaginaActual < ViewBag.TotalPaginas)
+        {
+            <a class="btn btn-outline-primary" href="@Url.Action("Index", new {
+                page = ViewBag.PaginaActual + 1,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                ano = Context.Request.Query["ano"]
+            })">
+                Siguiente
+            </a>
+        }
+    </div>
+</div>
+
+<nav aria-label="Paginación de vehículos" class="mt-4">
+    <ul class="pagination justify-content-center">
+        @{
+            int totalPaginas = ViewBag.TotalPaginas;
+            int paginaActual = ViewBag.PaginaActual;
+        }
+
+        @for (int i = 1; i <= totalPaginas; i++)
+        {
+            var url = Url.Action("Index", new {
+                page = i,
+                marca = Context.Request.Query["marca"],
+                estado = Context.Request.Query["estado"],
+                anoDesde = Context.Request.Query["anoDesde"],
+                anoHasta = Context.Request.Query["anoHasta"]
+            });
+
+            <li class="page-item @(i == paginaActual ? "active" : "")">
+                <a class="page-link" href="@url">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
+
+
+@section Scripts {
+    <script>
+        new Vue({
+            el: '#filtros',
+            data: {
+                marca: '@Context.Request.Query["marca"]',
+                modelo: '@Context.Request.Query["modelo"]',
+                anios: Array.from({ length: 25 }, (_, i) => new Date().getFullYear() - i),
+                anoDesde: '@Context.Request.Query["anoDesde"]',
+                anoHasta: '@Context.Request.Query["anoHasta"]',
+                estado: '@Context.Request.Query["estado"]',
+                modelos: @Html.Raw(JsonSerializer.Serialize(ViewBag.Modelos)),  // Usando ViewBag.Modelos
+                marcas: @Html.Raw(JsonSerializer.Serialize(ViewBag.Marcas)),  
+            },
+            computed: {
+                modelosFiltrados() {
+                    if (this.marca) {
+                        return this.modelos.filter(modelo => modelo.idMarca === parseInt(this.marca));
+                    }
+                    return this.modelos;
+                }
+
+            },
+            methods: {
+                filtrar() {
+                    const params = new URLSearchParams();
+                    if (this.marca) params.append("marca", this.marca);
+                    if (this.estado) params.append("estado", this.estado);
+                    if (this.anoDesde && this.anoDesde !== "otro") params.append("anoDesde", this.anoDesde);
+                    if (this.anoHasta && this.anoHasta !== "otro") params.append("anoHasta", this.anoHasta);
+                    if (this.modelo) params.append("modelo", this.modelo);
+                    window.location.href = "/Home/Index?" + params.toString();
+                },
+                limpiarFiltros() {
+                    this.marca = '';
+                    this.modelo = '';
+                    this.estado = '';
+                    this.ano = '';
+                    window.location.href = "/Home/Index";
+                }
+            }
+        });
+
+
+        function toggleFavorito(vehiculoId) {
+                const btn = document.querySelector(`#fav-btn-${vehiculoId} button`);
+                const icon = btn.querySelector('i');
+                const esFavorito = icon.classList.contains('bi-star-fill');
+
+                fetch(`/Home/${esFavorito ? 'QuitarFavorito' : 'MarcarFavorito'}?vehiculoId=${vehiculoId}`, {
+                    method: 'POST',
+                    headers: {
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || '', 
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al actualizar favorito');
+                    // Toggle clases
+                    icon.classList.toggle('bi-star');
+                    icon.classList.toggle('bi-star-fill');
+                    btn.classList.toggle('btn-outline-warning');
+                    btn.classList.toggle('btn-warning');
+                })
+                .catch(err => {
+                    Swal.fire("Error", "No se pudo actualizar el favorito. ¿Estás logueado?", "error");
+                    console.error(err);
+                });
+            }
+
+    </script>
+}
+
+
+<style>
+    .transition-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.transition-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+</style>

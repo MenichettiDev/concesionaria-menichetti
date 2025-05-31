@@ -188,7 +188,11 @@ namespace ConcesionariaApp.Controllers
         [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                id = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                if (id == null) return NotFound();
+            }
 
             try
             {
@@ -214,7 +218,7 @@ namespace ConcesionariaApp.Controllers
 
                 await _usuarioRepository.UpdateUsuarioAsync(usuario);
                 TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
-                return RedirectToAction("Index");
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
@@ -325,5 +329,76 @@ namespace ConcesionariaApp.Controllers
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             return RedirectToAction("Login", "Usuario");
         }
+
+
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> ActualizarFoto(int IdUsuario, IFormFile FotoPerfilFile, bool EliminarFoto, [FromServices] IWebHostEnvironment environment)
+        {
+            try
+            {
+                var usuario = await _usuarioRepository.GetUsuarioByIdAsync(IdUsuario);
+                if (usuario == null)
+                {
+                    return Json(new { success = false, message = "Usuario no encontrado." });
+                }
+
+                // Eliminar foto si se solicitó
+                if (EliminarFoto)
+                {
+                    if (!string.IsNullOrEmpty(usuario.FotoPerfil))
+                    {
+                        var rutaFoto = Path.Combine(environment.WebRootPath, usuario.FotoPerfil.TrimStart('/'));
+                        if (System.IO.File.Exists(rutaFoto))
+                        {
+                            System.IO.File.Delete(rutaFoto);
+                        }
+
+                        _usuarioRepository.ActualizarFotoPerfil(IdUsuario, null);
+                    }
+
+                    return Json(new { success = true, fotoUrl = "/img/defaultUser.jpg" });
+                }
+
+                // Lógica existente para actualizar la foto
+                if (FotoPerfilFile != null && FotoPerfilFile.Length > 0)
+                {
+                    // Borrar foto anterior si existe
+                    if (!string.IsNullOrEmpty(usuario.FotoPerfil))
+                    {
+                        var rutaFoto = Path.Combine(environment.WebRootPath, usuario.FotoPerfil.TrimStart('/'));
+                        if (System.IO.File.Exists(rutaFoto))
+                        {
+                            System.IO.File.Delete(rutaFoto);
+                        }
+                    }
+
+                    var uploadsPath = Path.Combine(environment.WebRootPath, "Uploads", "Usuarios");
+                    if (!Directory.Exists(uploadsPath))
+                        Directory.CreateDirectory(uploadsPath);
+
+                    var fileName = $"perfil_{IdUsuario}{Path.GetExtension(FotoPerfilFile.FileName)}";
+                    var filePath = Path.Combine(uploadsPath, fileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        FotoPerfilFile.CopyTo(stream);
+                    }
+
+                    var fotoUrl = Path.Combine("/Uploads/Usuarios/", fileName).Replace("\\", "/");
+                    _usuarioRepository.ActualizarFotoPerfil(IdUsuario, fotoUrl);
+
+                    return Json(new { success = true, fotoUrl = fotoUrl }); // Retorna la nueva URL de la foto
+                }
+
+                return Json(new { success = false, message = "No se ha recibido la foto." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "Error al actualizar la foto: " + ex.Message });
+            }
+        }
+
     }
 }

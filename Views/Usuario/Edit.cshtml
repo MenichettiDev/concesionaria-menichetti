@@ -1,4 +1,5 @@
 @model concesionaria_menichetti.Models.Usuario
+@using System.Security.Claims
 
 @{
     ViewData["Title"] = "Editar Usuario";
@@ -14,73 +15,200 @@
 {
     <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
 }
-<div id="usuarioEdit">
-    <form asp-action="Edit" method="post">
-        <input type="hidden" asp-for="Id" />
 
-        <div class="form-group">
-            <label>Nombre</label>
-            <input type="text" class="form-control" v-model="usuario.nombre" name="Nombre" required />
+<div class="container mt-4">
+
+    <div class="row">
+        <!-- Formulario de datos -->
+        <div class="col-md-7">
+            <form asp-action="Edit" method="post">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="form-group">
+                    <label asp-for="Nombre"></label>
+                    <input asp-for="Nombre" class="form-control" required />
+                    <span asp-validation-for="Nombre" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Email"></label>
+                    <input asp-for="Email" type="email" class="form-control" required />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Telefono"></label>
+                    <input asp-for="Telefono" class="form-control" required />
+                    <span asp-validation-for="Telefono" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Ubicacion"></label>
+                    <input asp-for="Ubicacion" class="form-control" required />
+                    <span asp-validation-for="Ubicacion" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="EsConcesionaria">¿Es concesionaria?</label>
+                    <select asp-for="EsConcesionaria" class="form-control">
+                        <option value="true">Sí</option>
+                        <option value="false">No</option>
+                    </select>
+                    <span asp-validation-for="EsConcesionaria" class="text-danger"></span>
+                </div>
+
+                @if (User.IsInRole("Administrador"))
+                {
+                    <div class="form-group
+                            <div class=" form-group">
+                        <label asp-for="Verificado">¿Verificado?</label>
+                        <select asp-for="Verificado" class="form-control">
+                            <option value="true">Sí</option>
+                            <option value="false">No</option>
+                        </select>
+                        <span asp-validation-for="Verificado" class="text-danger"></span>
+                    </div>
+                }
+
+                <div class="form-group">
+                    <label asp-for="Activo">Estado</label>
+                    <select asp-for="Activo" class="form-control">
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                    <span asp-validation-for="Activo" class="text-danger"></span>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input type="checkbox" class="form-check-input" id="cambiarPassword"
+                        onchange="togglePasswordFields()" />
+                    <label class="form-check-label" for="cambiarPassword">Cambiar contraseña</label>
+                </div>
+
+                <div id="passwordFields" style="display: none;">
+                    <div class="form-group mb-3">
+                        <label for="PasswordActual" class="form-label">Contraseña actual</label>
+                        <input type="password" name="PasswordActual" id="PasswordActual" class="form-control" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="NuevaPassword" class="form-label">Nueva contraseña</label>
+                        <input type="password" name="NuevaPassword" id="NuevaPassword" class="form-control" />
+                    </div>
+                    <div class="form-group mb-3">
+                        <label for="ConfirmarPassword" class="form-label">Confirmar nueva contraseña</label>
+                        <input type="password" name="ConfirmarPassword" id="ConfirmarPassword" class="form-control" />
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <a href="@Url.Action("Index", "Usuario")" class="btn btn-secondary">Volver</a>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                </div>
+            </form>
         </div>
 
-        <div class="form-group">
-            <label>Email</label>
-            <input type="email" class="form-control" v-model="usuario.email" name="Email" required />
-        </div>
-        <div class="form-group">
-            <label>Telefono</label>
-            <input type="text" class="form-control" v-model="usuario.Telefono" name="Telefono" required />
-        </div>
-        <div class="form-group">
-            <label>Ubicacion</label>
-            <input type="text" class="form-control" v-model="usuario.Ubicacion" name="Ubicacion" required />
-        </div>
+        @{
+            var idUsuarioLogueado = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
 
-        <div class="form-group">
-            <label>¿Es concesionaria?</label>
-            <select class="form-control" v-model="usuario.esConcesionaria" name="EsConcesionaria">
-                <option :value="true">Sí</option>
-                <option :value="false">No</option>
-            </select>
-        </div>
+        @if (idUsuarioLogueado == Model.Id.ToString())
+        {
+            <!-- Formulario de foto de perfil -->
+            <div class="col-md-5 d-flex align-items-start">
+                <form id="formActualizarFoto" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data"
+                    class="border p-4 rounded shadow-sm bg-light w-100 text-center">
+                    <h5 class="mb-4">Foto de Perfil</h5>
 
-        <div class="form-group">
-            <label>¿Verificado?</label>
-            <select class="form-control" v-model="usuario.verificado" name="Verificado">
-                <option :value="true">Sí</option>
-                <option :value="false">No</option>
-            </select>
-        </div>
+                    <div class="mb-3">
+                        <img id="previewFoto"
+                            src="@(string.IsNullOrEmpty(Model.FotoPerfil) ? "/img/defaultUser.jpg" : Model.FotoPerfil)"
+                            class="img-thumbnail mb-3" style="width: 180px; height: 180px; object-fit: cover;" />
+                    </div>
 
-        <div class="form-group">
-            <label>Estado</label>
-            <select class="form-control" v-model="usuario.activo" name="Activo">
-                <option :value="true">Activo</option>
-                <option :value="false">Inactivo</option>
-            </select>
-        </div>
+                    <div class="form-group mb-3">
+                        <input type="file" name="FotoPerfilFile" id="FotoPerfilFile" accept="image/*" class="form-control"
+                            onchange="previewFotoPerfil(event)" />
+                    </div>
 
-        <div class="mt-3">
-            <a href="@Url.Action("Index", "Usuario")" class="btn btn-secondary">Volver</a>
-            <button type="submit" class="btn btn-primary">Guardar</button>
-        </div>
-    </form>
+                    <input type="hidden" name="IdUsuario" value="@Model.Id" />
+                    <input type="hidden" id="EliminarFoto" name="EliminarFoto" value="false" />
+
+                    <button type="submit" class="btn btn-success w-100">Actualizar Foto</button>
+                    @if (!string.IsNullOrEmpty(Model.FotoPerfil) && Model.FotoPerfil != "/img/defaultUser.jpg")
+                    {
+                        <button type="button" class="btn btn-danger w-100 mt-2" onclick="eliminarFoto()">Eliminar Foto</button>
+                    }
+                </form>
+            </div>
+        }
+    </div>
 </div>
 
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.css">
+<script src="https://cdn.jsdelivr.net/npm/notyf@3/notyf.min.js"></script>
+<script>
+    const notyf = new Notyf();
+</script>
+
 @section Scripts {
     <script>
-        new Vue({
-            el: '#usuarioEdit',
-            data: {
-                usuario: {
-                    nombre: '@Model.Nombre',
-                    email: '@Model.Email',
-                    esConcesionaria: '@(Model.EsConcesionaria?.ToString().ToLower() ?? "false")' === 'true',
-                    verificado: '@(Model.Verificado?.ToString().ToLower() ?? "false")' === 'true',
-                    activo: '@(Model.Activo?.ToString().ToLower() ?? "false")' === 'true'
-                }
-            }
+        function eliminarFoto() {
+            document.getElementById('EliminarFoto').value = 'true';
+
+            $("#formActualizarFoto").submit();
+        }
+
+
+        function togglePasswordFields() {
+            var check = document.getElementById('cambiarPassword');
+            var passwordFields = document.getElementById('passwordFields');
+            passwordFields.style.display = check.checked ? 'block' : 'none';
+        }
+
+        // Para previsualizar la foto de perfil antes de enviarla
+        function previewFotoPerfil(event) {
+            var reader = new FileReader();
+            reader.onload = function () {
+                var output = document.getElementById('previewFoto');
+                output.src = reader.result;
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        // Función para subir la foto de perfil sin recargar la página
+        $(document).ready(function () {
+            $("#formActualizarFoto").submit(function (event) {
+                event.preventDefault(); // Evita que el formulario se envíe de la forma tradicional
+
+                var formData = new FormData(this); // Captura los datos del formulario
+
+                $.ajax({
+                    url: '@Url.Action("ActualizarFoto", "Usuario")', // La acción en el controller
+                    type: 'POST',
+                    data: formData,
+                    contentType: false, // No establece Content-Type
+                    processData: false, // No procesa los datos del formulario
+                    success: function (response) {
+                        // Si el backend responde correctamente, actualizar la imagen de perfil
+                        $('#previewFoto').attr('src', response.fotoUrl); // Actualizar la imagen de la vista
+                        notyf.success('Accion realizada con éxito');
+
+                        // Ocultar el botón de eliminar si la foto se eliminó o mostrar si la foto es nueva
+                        if (response.fotoUrl === "/img/defaultUser.jpg") {
+                            $("button.btn-danger").hide();  // Ocultar el botón de eliminar foto
+                        } else if (response.fotoUrl !== "/img/defaultUser.jpg") {
+                            $("button.btn-danger").show(); // Mostrar el botón de eliminar foto
+                        }
+
+                    },
+                    error: function () {
+                        notyf.error('Error al ejecutar la acción');
+                    }
+                });
+            });
         });
+
+
     </script>
 }

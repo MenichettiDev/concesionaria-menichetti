@@ -142,5 +142,15 @@ public class UsuarioRepository
     }
 
 
+    public void ActualizarFotoPerfil(int idUsuario, string? nuevaRuta)
+    {
+        var usuario = _context.Usuarios.FirstOrDefault(u => u.Id == idUsuario);
+        if (usuario == null)
+        {
+            throw new Exception($"No se encontró un usuario con ID {idUsuario}.");
+        }
 
+        usuario.FotoPerfil = nuevaRuta;
+        _context.SaveChanges();
+    }
 }

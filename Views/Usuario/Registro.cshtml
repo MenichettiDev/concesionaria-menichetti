@@ -26,12 +26,20 @@
             border-radius: 1rem;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
         }
+
+        .fullscreen-background {
+            background: linear-gradient(135deg, #2d3941, #8e9fa5);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="registro-app">
+    <div id="registro-app" div class="fullscreen-background">
         <div class="form-container">
             <h2 class="text-center mb-4">Registro de Usuario</h2>
 
@@ -89,6 +97,10 @@
                     <button type="submit" class="btn btn-success mt-3">Registrarse</button>
                 </div>
             </form>
+            <div class="d-grid">
+                <a asp-controller="Usuario" asp-action="Login" class="btn btn-secondary mt-3">Ya tengo
+                    cuenta</a>
+            </div>
         </div>
     </div>
 

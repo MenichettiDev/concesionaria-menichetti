@@ -293,8 +293,8 @@ else
             methods: {
                 filtrar() {
                     const params = new URLSearchParams();
-                    if (this.marca) params.append("marca", this.marca);
-                    if (this.estado) params.append("estado", this.estado);
+                    if (this.marca) params.append("idMarca", this.marca);
+                    if (this.modelo) params.append("idModelo", this.modelo);
                     if (this.anoDesde && this.anoDesde !== "otro") params.append("anoDesde", this.anoDesde);
                     if (this.anoHasta && this.anoHasta !== "otro") params.append("anoHasta", this.anoHasta);
                     if (this.modelo) params.append("modelo", this.modelo);

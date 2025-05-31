@@ -79,7 +79,7 @@
 else if( !User.Identity.IsAuthenticated && ViewBag.TieneAcceso == false )
 {
     <a class="btn btn-primary btn-lg mb-3" title="Acceso"
-        href="@Url.Action("Create", "Pagos", new 
+        href="@Url.Action("Login", "Usuario", new 
                 {   tipo = "Acceso",
                     detalle = "Pago por detalles vehiculo: " , 
                     Id = Model.Id,

@@ -40,8 +40,8 @@ public class HomeController : Controller
     int? idModelo,
     int? anoDesde,
     int? anoHasta,
-    // decimal? precioDesde,
-    // decimal? precioHasta,
+    decimal? precioDesde,
+    decimal? precioHasta,
     // string? propietario,
     int? estado = 1,
     int page = 1)
@@ -52,7 +52,7 @@ public class HomeController : Controller
             int pageSize = 10;
 
             var result = await _homeRepository.ObtenerVehiculosFiltradosAsync(
-            idMarca, idModelo, anoDesde, anoHasta, estado, page, pageSize);
+            idMarca, idModelo, anoDesde, anoHasta, precioDesde, precioHasta, estado, page, pageSize);
             //  precioDesde, precioHasta, propietario,
 
             // Obtenemos las marcas y modelos únicos
@@ -108,7 +108,16 @@ public class HomeController : Controller
 
         try
         {
-            int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            int idUser = 0;
+
+            if (User.Identity != null && User.Identity.IsAuthenticated)
+            {
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+                if (userIdClaim != null && int.TryParse(userIdClaim.Value, out int parsedId))
+                {
+                    idUser = parsedId;
+                }
+            }
 
             var (vehiculo, tieneAcceso) = await _homeRepository.GetVehiculoByIdAsyncConFoto(id, idUser);
             if (vehiculo == null) return NotFound();

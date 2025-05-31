@@ -25,7 +25,7 @@ public class HomeRepository
     }
 
     public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(
-    int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
+    int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, decimal? precioDesde, decimal? precioHasta, int? estado, int page, int pageSize)
     {
         var query = GetQueryable();
 
@@ -61,6 +61,16 @@ public class HomeRepository
             query = query.Where(v => v.Anio <= anoHasta.Value);
         }
 
+        if (precioDesde.HasValue)
+        {
+            query = query.Where(v => v.Precio >= precioDesde);
+        }
+
+        if (precioHasta.HasValue)
+        {
+            query = query.Where(v => v.Precio <= precioHasta);
+        }
+
         var totalVehiculos = await query.CountAsync();
 
         var vehiculos = await query
@@ -77,7 +87,7 @@ public class HomeRepository
 
 
 
-    public async Task<(Vehiculo vehiculo, bool tieneAcceso)> GetVehiculoByIdAsyncConFoto(int idVehiculo, int idUsuarioLogueado)
+    public async Task<(Vehiculo vehiculo, bool tieneAcceso)> GetVehiculoByIdAsyncConFoto(int idVehiculo, int? idUsuarioLogueado)
 
     {
         try
@@ -94,8 +104,13 @@ public class HomeRepository
                 return (null, false);
 
             // Verifica si el usuario logueado pagó acceso a este vehículo
+            if (idUsuarioLogueado == null)
+            {
+                return (vehiculo, false);
+            }
             bool tieneAcceso = vehiculo.AccesosPagados.Any(a =>
                 a.UsuarioId == idUsuarioLogueado && a.Activo == 1);
+
 
             return (vehiculo, tieneAcceso);
         }

@@ -116,8 +116,8 @@ namespace ConcesionariaApp.Controllers
                 await _usuarioRepository.CreateUsuarioAsync(usuario);
                 TempData["SuccessMessage"] = "Usuario cargado correctamente.";
 
-                // Redirigir a la lista de usuarios
-                return RedirectToAction("Index");
+
+                return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
@@ -209,23 +209,82 @@ namespace ConcesionariaApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> Edit(int id, Usuario usuario)
+        public async Task<IActionResult> Edit(Usuario usuario, string PasswordActual, string NuevaPassword, string ConfirmarPassword)
         {
-            if (id != usuario.Id) return NotFound();
-
             try
             {
+                var idClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (idClaim == null)
+                    return Unauthorized();
 
-                await _usuarioRepository.UpdateUsuarioAsync(usuario);
+                int userIdActual = int.Parse(idClaim.Value);
+
+                bool esAdmin = User.IsInRole("Administrador");
+                if (userIdActual != usuario.Id && !esAdmin)
+                {
+                    return Forbid();
+                }
+
+
+                var usuarioExistente = await _usuarioRepository.GetUsuarioByIdAsync(usuario.Id);
+                if (usuarioExistente == null)
+                {
+                    ViewBag.ErrorMessage = "Usuario no encontrado.";
+                    return View("Edit", usuario);
+                }
+
+                usuarioExistente.Email = usuario.Email;
+
+                if (esAdmin)
+                {
+                    usuarioExistente.Rol = usuario.Rol;
+                }
+
+                if (!string.IsNullOrEmpty(PasswordActual) ||
+                    !string.IsNullOrEmpty(NuevaPassword) ||
+                    !string.IsNullOrEmpty(ConfirmarPassword))
+                {
+                    string hashedActual = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: PasswordActual,
+                        salt: Encoding.ASCII.GetBytes(_configuration["Salt"]),
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 10000,
+                        numBytesRequested: 256 / 8));
+
+                    if (hashedActual != usuarioExistente.Contraseña)
+                    {
+                        ViewBag.ErrorMessage = "La contraseña actual es incorrecta.";
+                        return View(usuario);
+                    }
+
+                    if (NuevaPassword != ConfirmarPassword)
+                    {
+                        ViewBag.ErrorMessage = "La nueva contraseña y la confirmación no coinciden.";
+                        return View(usuario);
+                    }
+
+                    string hashedNueva = Convert.ToBase64String(KeyDerivation.Pbkdf2(
+                        password: NuevaPassword,
+                        salt: Encoding.ASCII.GetBytes(_configuration["Salt"]),
+                        prf: KeyDerivationPrf.HMACSHA1,
+                        iterationCount: 10000,
+                        numBytesRequested: 256 / 8));
+
+                    usuarioExistente.Contraseña = hashedNueva;
+                }
+
+                await _usuarioRepository.UpdateUsuarioAsync(usuarioExistente);
+
                 TempData["SuccessMessage"] = "Usuario actualizado correctamente.";
                 return RedirectToAction("Index", "Home");
             }
             catch (Exception ex)
             {
-                ViewBag.ErrorMessage = $"Error al actualizar el usuario: {ex}";
-                return View(usuario);
+                ViewBag.ErrorMessage = $"Ocurrió un error al editar el Usuario: {ex.Message}";
+                return View("Edit", usuario);
             }
         }
+
 
         public async Task<IActionResult> Delete(int? id)
         {
@@ -256,7 +315,7 @@ namespace ConcesionariaApp.Controllers
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Ocurrió un error al eliminar el usuario: {ex.Message}";
-                return RedirectToAction("Index");
+                return View();
             }
         }
 
@@ -399,6 +458,16 @@ namespace ConcesionariaApp.Controllers
                 return Json(new { success = false, message = "Error al actualizar la foto: " + ex.Message });
             }
         }
+
+
+        [Authorize]
+        public IActionResult Perfil()
+        {
+            // Redirige siempre al Edit del usuario actual
+            var idUsuario = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return RedirectToAction("Edit", new { id = idUsuario });
+        }
+
 
     }
 }

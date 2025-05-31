@@ -114,8 +114,8 @@ else
         {
             <div class="col">
                     
-                <a href="@Url.Action("Details", "Home", new { id = vehiculo.Id })" class="text-decoration-none text-dark">
                     <div class="card h-100 shadow-sm border-0 transition-card">
+                <a href="@Url.Action("Details", "Home", new { id = vehiculo.Id })" class="text-decoration-none text-dark">
                         @if (vehiculo.FotosVehiculos.Any())
                         {
                             var fotoUrl = vehiculo.FotosVehiculos.First().FotoArchivo;
@@ -127,6 +127,7 @@ else
                                 <i class="bi bi-card-image fs-1 text-secondary"></i>
                             </div>
                         }
+                </a>
 
                         <div class="card-body">
                             <h5 class="card-title mb-1">
@@ -151,7 +152,6 @@ else
 
                         </div>
                     </div>
-                </a>
             </div>
 
         }

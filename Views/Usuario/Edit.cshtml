@@ -2,6 +2,10 @@
 @using System.Security.Claims
 
 @{
+    var idUsuarioLogueado = User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
+
+@{
     ViewData["Title"] = "Editar Usuario";
 }
 
@@ -57,10 +61,10 @@
                     <span asp-validation-for="EsConcesionaria" class="text-danger"></span>
                 </div>
 
-                @if (User.IsInRole("Administrador"))
+                @if (User.IsInRole("Admin"))
                 {
                     <div class="form-group
-                            <div class=" form-group">
+                                                <div class=" form-group">
                         <label asp-for="Verificado">¿Verificado?</label>
                         <select asp-for="Verificado" class="form-control">
                             <option value="true">Sí</option>
@@ -79,26 +83,31 @@
                     <span asp-validation-for="Activo" class="text-danger"></span>
                 </div>
 
-                <div class="form-check form-switch mb-3">
-                    <input type="checkbox" class="form-check-input" id="cambiarPassword"
-                        onchange="togglePasswordFields()" />
-                    <label class="form-check-label" for="cambiarPassword">Cambiar contraseña</label>
-                </div>
+                @if (idUsuarioLogueado == Model.Id.ToString())
+                {
 
-                <div id="passwordFields" style="display: none;">
-                    <div class="form-group mb-3">
-                        <label for="PasswordActual" class="form-label">Contraseña actual</label>
-                        <input type="password" name="PasswordActual" id="PasswordActual" class="form-control" />
+                    <div class="form-check form-switch mb-3">
+                        <input type="checkbox" class="form-check-input" id="cambiarPassword"
+                            onchange="togglePasswordFields()" />
+                        <label class="form-check-label" for="cambiarPassword">Cambiar contraseña</label>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="NuevaPassword" class="form-label">Nueva contraseña</label>
-                        <input type="password" name="NuevaPassword" id="NuevaPassword" class="form-control" />
+
+                    <div id="passwordFields" style="display: none;">
+                        <div class="form-group mb-3">
+                            <label for="PasswordActual" class="form-label">Contraseña actual</label>
+                            <input type="password" name="PasswordActual" id="PasswordActual" class="form-control" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="NuevaPassword" class="form-label">Nueva contraseña</label>
+                            <input type="password" name="NuevaPassword" id="NuevaPassword" class="form-control" />
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="ConfirmarPassword" class="form-label">Confirmar nueva contraseña</label>
+                            <input type="password" name="ConfirmarPassword" id="ConfirmarPassword" class="form-control" />
+                        </div>
                     </div>
-                    <div class="form-group mb-3">
-                        <label for="ConfirmarPassword" class="form-label">Confirmar nueva contraseña</label>
-                        <input type="password" name="ConfirmarPassword" id="ConfirmarPassword" class="form-control" />
-                    </div>
-                </div>
+                }
+
 
                 <div class="mt-3">
                     <a href="@Url.Action("Index", "Usuario")" class="btn btn-secondary">Volver</a>
@@ -107,24 +116,23 @@
             </form>
         </div>
 
-        @{
-            var idUsuarioLogueado = User.FindFirstValue(ClaimTypes.NameIdentifier);
-        }
 
-        @if (idUsuarioLogueado == Model.Id.ToString())
-        {
-            <!-- Formulario de foto de perfil -->
-            <div class="col-md-5 d-flex align-items-start">
-                <form id="formActualizarFoto" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data"
-                    class="border p-4 rounded shadow-sm bg-light w-100 text-center">
-                    <h5 class="mb-4">Foto de Perfil</h5>
 
-                    <div class="mb-3">
-                        <img id="previewFoto"
-                            src="@(string.IsNullOrEmpty(Model.FotoPerfil) ? "/img/defaultUser.jpg" : Model.FotoPerfil)"
-                            class="img-thumbnail mb-3" style="width: 180px; height: 180px; object-fit: cover;" />
-                    </div>
 
+        <!-- Formulario de foto de perfil -->
+        <div class="col-md-5 d-flex align-items-start">
+            <form id="formActualizarFoto" asp-action="ActualizarFoto" method="post" enctype="multipart/form-data"
+                class="border p-4 rounded shadow-sm bg-light w-100 text-center">
+                <h5 class="mb-4">Foto de Perfil</h5>
+
+                <div class="mb-3">
+                    <img id="previewFoto"
+                        src="@(string.IsNullOrEmpty(Model.FotoPerfil) ? "/img/defaultUser.jpg" : Model.FotoPerfil)"
+                        class="img-thumbnail mb-3" style="width: 180px; height: 180px; object-fit: cover;" />
+                </div>
+
+                @if (idUsuarioLogueado == Model.Id.ToString())
+                {
                     <div class="form-group mb-3">
                         <input type="file" name="FotoPerfilFile" id="FotoPerfilFile" accept="image/*" class="form-control"
                             onchange="previewFotoPerfil(event)" />
@@ -133,14 +141,15 @@
                     <input type="hidden" name="IdUsuario" value="@Model.Id" />
                     <input type="hidden" id="EliminarFoto" name="EliminarFoto" value="false" />
 
+
                     <button type="submit" class="btn btn-success w-100">Actualizar Foto</button>
                     @if (!string.IsNullOrEmpty(Model.FotoPerfil) && Model.FotoPerfil != "/img/defaultUser.jpg")
                     {
                         <button type="button" class="btn btn-danger w-100 mt-2" onclick="eliminarFoto()">Eliminar Foto</button>
                     }
-                </form>
-            </div>
-        }
+                }
+            </form>
+        </div>
     </div>
 </div>
 

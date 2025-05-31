@@ -37,10 +37,10 @@
             <input type="hidden" asp-for="Id" />
         }
 
-        <input type="hidden" name="vehiculoId" value="@ViewBag.vehiculoId" />
+        <input type="hidden" name="Id" value="@ViewBag.vehiculoId" />
 
 
         <button type="submit" class="btn btn-primary">Confirmar Pago</button>
-        <a asp-action="Index" asp-controller="Vehiculos" class="btn btn-secondary ms-2">Cancelar</a>
+        <a asp-action="Index" asp-controller="Home" class="btn btn-secondary ms-2">Cancelar</a>
     </form>
 </div>

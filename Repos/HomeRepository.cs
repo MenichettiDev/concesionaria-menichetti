@@ -74,6 +74,7 @@ public class HomeRepository
         var totalVehiculos = await query.CountAsync();
 
         var vehiculos = await query
+        .OrderByDescending(v => v.Destacados.Any())
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();

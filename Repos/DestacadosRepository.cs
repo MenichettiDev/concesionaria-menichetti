@@ -30,14 +30,23 @@ public class DestacadoRepository : GenericRepository<Destacado>
 
     public async Task MarcarVehiculoComoDestacadoAsync(int vehiculoId)
     {
-        var destacado = new Destacado
+        try
         {
-            VehiculoId = vehiculoId,
-            FechaInicio = DateTime.Now,
-            FechaFin = DateTime.Now.AddDays(30)
-        };
-        _context.Destacados.Add(destacado);
-        await _context.SaveChangesAsync();
+            var destacado = new Destacado
+            {
+                VehiculoId = vehiculoId,
+                FechaInicio = DateTime.Now,
+                FechaFin = DateTime.Now.AddDays(30)
+            };
+            _context.Destacados.Add(destacado);
+            await _context.SaveChangesAsync();
+        }
+        catch (System.Exception ex)
+        {
+
+            throw new Exception($"Error al marcar el vehiculo como destacado, vehículo con ID {vehiculoId}", ex);
+        }
+
     }
     public async Task<IEnumerable<Destacado>> ObtenerPorVehiculoIdAsync(int vehiculoId)
     {

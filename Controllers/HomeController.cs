@@ -98,6 +98,7 @@ public class HomeController : Controller
         catch (Exception ex)
         {
             ViewBag.ErrorMessage = $"Error al cargar los vehiculos: {ex.Message}";
+
             return View();
         }
     }

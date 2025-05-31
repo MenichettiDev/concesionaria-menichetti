@@ -362,6 +362,7 @@ namespace ConcesionariaApp.Controllers
                     new Claim(ClaimTypes.Name, usuario.Email),
                     // new Claim("FullName", usuario.Nombre + " " + usuario.Apellido),
                     new Claim(ClaimTypes.Role, usuario.Rol), // importante si vas a usar roles
+                    // new Claim(ClaimTypes.UserData, usuario.EsConcesionaria.ToString()), 
                     new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString())
 
                 };

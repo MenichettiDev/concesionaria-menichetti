@@ -86,9 +86,9 @@ namespace concesionaria_menichetti.Controllers
 
                 await _pagosRepository.CreatePagoAsync(pago);
 
-                // Console.WriteLine("vehiculoId: " + Id);
-                if (model.Tipo == "Destacado" && Id.HasValue)
+                if (model.Tipo == "Destacado")
                 {
+                    // Console.WriteLine("vehiculoId: " + Id);
                     var VehiculoId = Id.Value;
 
                     await _destacadosRepository.MarcarVehiculoComoDestacadoAsync(VehiculoId);

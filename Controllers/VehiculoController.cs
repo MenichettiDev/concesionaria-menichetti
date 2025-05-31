@@ -9,12 +9,14 @@ namespace ConcesionariaApp.Controllers
     public class VehiculoController : Controller
     {
         private readonly VehiculoRepository _vehiculoRepository;
+        private readonly UsuarioRepository _usuarioRepository;
         private readonly ILogger<VehiculoController> _logger;
 
-        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository)
+        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository, UsuarioRepository usuarioRepository)
         {
             _logger = logger;
             _vehiculoRepository = vehiculoRepository;
+            _usuarioRepository = usuarioRepository;
         }
 
         public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado = 1, int page = 1)
@@ -30,6 +32,8 @@ namespace ConcesionariaApp.Controllers
                 var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
                 var modelos = await _vehiculoRepository.GetModelosAsync(); // Método para obtener los modelos
 
+                var usuario = await _usuarioRepository.GetUsuarioByIdAsync(idUser); // o similar
+                ViewBag.EsConcesionaria = usuario?.EsConcesionaria ?? false;
 
                 //pasamos la data a la vista
                 ViewBag.Marcas = marcas.Select(m => new

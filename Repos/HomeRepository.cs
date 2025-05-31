@@ -77,6 +77,34 @@ public class HomeRepository
 
 
 
+    public async Task<(Vehiculo vehiculo, bool tieneAcceso)> GetVehiculoByIdAsyncConFoto(int idVehiculo, int idUsuarioLogueado)
+
+    {
+        try
+        {
+            var vehiculo = await _context.Vehiculos
+                .Include(v => v.Modelo)
+                    .ThenInclude(m => m.Marca)
+                .Include(v => v.FotosVehiculos)
+                .Include(v => v.Usuario)
+                .Include(v => v.AccesosPagados)
+                .FirstOrDefaultAsync(v => v.Id == idVehiculo);
+
+            if (vehiculo == null)
+                return (null, false);
+
+            // Verifica si el usuario logueado pagó acceso a este vehículo
+            bool tieneAcceso = vehiculo.AccesosPagados.Any(a =>
+                a.UsuarioId == idUsuarioLogueado && a.Activo == 1);
+
+            return (vehiculo, tieneAcceso);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error al obtener el vehículo con ID {idVehiculo}", ex);
+        }
+    }
+
 
 
     public async Task<List<Marca>> GetMarcasAsync()

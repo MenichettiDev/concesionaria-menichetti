@@ -65,9 +65,62 @@
     </div>
 </div>
 
-<a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
-    <i class="bi bi-arrow-left"></i> Volver a inicio
-</a>
+@if (User.Identity.IsAuthenticated && ViewBag.TieneAcceso == false)
+{
+    <a class="btn btn-primary btn-lg mb-3" title="Acceso"
+        href="@Url.Action("Create", "Pagos", new 
+        {   tipo = "Acceso",
+            detalle = "Pago por detalles vehiculo: " , 
+            Id = Model.Id,
+            monto =500 })">
+        <i class="bi bi-person-lines-fill"></i> Conoce los datos del vendedor
+    </a>
+}
+else if( !User.Identity.IsAuthenticated && ViewBag.TieneAcceso == false )
+{
+    <a class="btn btn-primary btn-lg mb-3" title="Acceso"
+        href="@Url.Action("Create", "Pagos", new 
+                {   tipo = "Acceso",
+                    detalle = "Pago por detalles vehiculo: " , 
+                    Id = Model.Id,
+                    monto =500 })">
+        <i class="bi bi-person-lines-fill"></i> Registrate para conocer los datos del vendedor
+    </a>
+}
+
+
+@if (Model.Usuario != null && ViewBag.TieneAcceso == true)
+{
+    <div class="card shadow rounded p-4 mb-4 bg-light">
+        <h4>Datos del Vendedor</h4>
+        <div class="row g-4">
+            <div class="col-md-9">
+                <p><strong>Nombre:</strong> @Model.Usuario.Nombre</p>
+                <p><strong>Email:</strong> <a href="mailto:@Model.Usuario.Email">@Model.Usuario.Email</a></p>
+                @if (!string.IsNullOrEmpty(Model.Usuario.Telefono))
+                {
+                    <p><strong>Teléfono:</strong> <a href="tel:@Model.Usuario.Telefono">@Model.Usuario.Telefono</a></p>
+                }
+                @if (!string.IsNullOrEmpty(Model.Usuario.Ubicacion))
+                {
+                    <p><strong>Ubicación:</strong> @Model.Usuario.Ubicacion</p>
+                }
+            </div>
+        </div>
+    </div>
+}
+@* else
+{
+    <p>Información del dueño no disponible.</p>
+} *@
+
+
+<div>
+
+    <a href="@Url.Action("Index", "Home")" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left"></i> Volver a inicio
+    </a>
+</div>
 
 
 <!-- Modal personalizado funcional -->

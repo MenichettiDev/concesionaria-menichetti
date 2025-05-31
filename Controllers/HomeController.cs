@@ -102,14 +102,19 @@ public class HomeController : Controller
         }
     }
 
-    public async Task<IActionResult> Details(int? id)
+    public async Task<IActionResult> Details(int id)
     {
-        if (id == null) return NotFound();
+        // if (id == null) return NotFound();
 
         try
         {
-            var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsyncConFoto(id.Value);
+            int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+            var (vehiculo, tieneAcceso) = await _homeRepository.GetVehiculoByIdAsyncConFoto(id, idUser);
             if (vehiculo == null) return NotFound();
+
+            ViewBag.TieneAcceso = tieneAcceso;
+
             return View(vehiculo);
         }
         catch (Exception ex)
@@ -118,6 +123,8 @@ public class HomeController : Controller
             return View();
         }
     }
+
+
     public IActionResult Privacy()
     {
         return View();

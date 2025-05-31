@@ -135,6 +135,7 @@ else
                             <h6 class="card-subtitle text-muted mb-2">
                                 <small>Modelo: @vehiculo.Anio</small>
                             </h6>
+                            @if (User.Identity.IsAuthenticated){
 
                             <div class="d-flex flex-wrap gap-2">
                                 <span id="fav-btn-@vehiculo.Id">
@@ -145,12 +146,9 @@ else
                                         <i class="bi @(ViewBag.FavoritosIds != null && ((List<int>)ViewBag.FavoritosIds).Contains(vehiculo.Id) ? "bi-star-fill" : "bi-star")"></i>
                                     </button>
                                 </span>
-
                             </div>
-                        </div>
+                            }
 
-                        <div class="card-footer bg-light text-muted small">
-                            ID: @vehiculo.Id
                         </div>
                     </div>
                 </a>

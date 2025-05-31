@@ -90,6 +90,7 @@ builder.Services.AddScoped<ContratoSuscripcionRepository>();
 builder.Services.AddScoped<ContratoPlanesRepository>();
 builder.Services.AddScoped<HomeRepository>();
 builder.Services.AddScoped<FavoritoRepository>();
+builder.Services.AddScoped<AccesosPagadoRepository>();
 
 
 

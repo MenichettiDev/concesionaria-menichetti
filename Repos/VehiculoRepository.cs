@@ -105,11 +105,17 @@ public class VehiculoRepository
     {
         try
         {
+
+
             return await _context.Vehiculos
                 .Include(v => v.Modelo)
                     .ThenInclude(m => m.Marca)
-                .Include(v => v.FotosVehiculos) // 👈 Agregamos esto
+                .Include(v => v.FotosVehiculos)
+                .Include(v => v.Usuario)
+                .Include(v => v.AccesosPagados)
                 .FirstOrDefaultAsync(v => v.Id == id);
+
+
         }
         catch (Exception ex)
         {

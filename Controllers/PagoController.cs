@@ -14,8 +14,9 @@ namespace concesionaria_menichetti.Controllers
         private readonly ContratoPlanesRepository _contratoPlanesRepository;
         private readonly UsuarioRepository _usuarioRepository;
         private readonly ConcesionariaRepository _concesionariaRepository;
+        private readonly AccesosPagadoRepository _accesosRepository;
 
-        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository, VehiculoRepository vehiculoRepository, ContratoPlanesRepository contratoPlanesRepository, ContratoSuscripcionRepository contratoSuscripcionRepository, UsuarioRepository usuarioRepository, ConcesionariaRepository concesionariaRepository)
+        public PagosController(PagoRepository pagosRepository, DestacadoRepository destacadosRepository, VehiculoRepository vehiculoRepository, ContratoPlanesRepository contratoPlanesRepository, ContratoSuscripcionRepository contratoSuscripcionRepository, UsuarioRepository usuarioRepository, ConcesionariaRepository concesionariaRepository, AccesosPagadoRepository accesosRepository)
 
         {
             _vehiculoRepository = vehiculoRepository;
@@ -25,6 +26,7 @@ namespace concesionaria_menichetti.Controllers
             _contratoPlanesRepository = contratoPlanesRepository;
             _usuarioRepository = usuarioRepository;
             _concesionariaRepository = concesionariaRepository;
+            _accesosRepository = accesosRepository;
         }
 
         // GET Create
@@ -42,6 +44,7 @@ namespace concesionaria_menichetti.Controllers
                 "Destacado" => $"Destacar vehículo ID {vehiculoId}",
                 "Suscripcion" => "Pago de suscripción",
                 "Plan" => "Contratación de plan",
+                "Acceso" => $"Informacion vehiculo {vehiculoId}",
                 _ => "Pago genérico"
             };
 
@@ -109,6 +112,15 @@ namespace concesionaria_menichetti.Controllers
 
                     await _contratoPlanesRepository.CargarContratoPlan(idPlan, Concesionaria.Id);
                     TempData["SuccessMessage"] = "Pago de plan registrado correctamente.";
+                }
+                else if (model.Tipo == "Acceso")
+                {
+                    var idVehiculo = Id.Value;
+                    int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+
+                    await _accesosRepository.CrearAccesoAsync(idUser, idVehiculo);
+                    TempData["SuccessMessage"] = "Pago de acceso registrado correctamente.";
+                    return RedirectToAction("Details", "Home", new { id = idVehiculo });
                 }
                 else
                 {

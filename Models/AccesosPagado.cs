@@ -13,6 +13,8 @@ public partial class AccesosPagado
 
     public DateTime? Fecha { get; set; }
 
+    public int Activo { get; set; }
+
     public virtual Usuario? Usuario { get; set; }
 
     public virtual Vehiculo? Vehiculo { get; set; }

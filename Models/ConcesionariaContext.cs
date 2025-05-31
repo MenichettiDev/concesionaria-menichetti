@@ -71,6 +71,9 @@ public partial class ConcesionariaContext : DbContext
             entity.HasIndex(e => e.VehiculoId, "vehiculoId");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Activo)
+                .HasDefaultValueSql("'1'")
+                .HasColumnName("activo");
             entity.Property(e => e.Fecha)
                 .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("timestamp")

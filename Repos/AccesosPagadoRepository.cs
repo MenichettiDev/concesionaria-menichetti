@@ -14,6 +14,30 @@ public class AccesosPagadoRepository : GenericRepository<AccesosPagado>
         _context = context;
     }
 
+    public async Task<AccesosPagado> CrearAccesoAsync(int usuarioId, int vehiculoId)
+    {
+        try
+        {
+            var nuevoAcceso = new AccesosPagado
+            {
+                UsuarioId = usuarioId,
+                VehiculoId = vehiculoId,
+                Fecha = DateTime.Now,
+                Activo = 1
+            };
+
+            _context.AccesosPagados.Add(nuevoAcceso);
+            await _context.SaveChangesAsync();
+
+            return nuevoAcceso;
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error al registrar el acceso pagado", ex);
+        }
+    }
+
+
     public async Task<IEnumerable<AccesosPagado>> ObtenerTodosAsync()
     {
         try

@@ -17,7 +17,14 @@
 <body>
     <!-- Sidebar -->
     <div class="sidebar">
-        <h4>🚗 VM Autos</h4>
+        <h4 class="mb-4">🚗 <strong>VM Autos</strong></h4>
+
+        <div class="mb-3">
+            <span class="badge bg-primary text-white px-3 py-2 rounded-pill">
+                👋 Hola, <strong>@(User.Identity.IsAuthenticated? User.Identity.Name : "Invitado")</strong>
+            </span>
+        </div>
+
         @if (!User.Identity.IsAuthenticated)
         {
             <a asp-area="" asp-controller="Home" asp-action="Index">🏠 Inicio</a>

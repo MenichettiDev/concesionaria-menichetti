@@ -1,6 +1,7 @@
 using concesionaria_menichetti.Models;
 using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ConcesionariaApp.Controllers
@@ -21,8 +22,9 @@ namespace ConcesionariaApp.Controllers
             try
             {
                 int pageSize = 10;
+                int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
 
-                var result = await _vehiculoRepository.ObtenerVehiculosFiltradosAsync(idMarca, idModelo, anoDesde, anoHasta, estado, page, pageSize);
+                var result = await _vehiculoRepository.ObtenerVehiculosFiltradosAsync(idUser, idMarca, idModelo, anoDesde, anoHasta, estado, page, pageSize);
 
                 // Obtenemos las marcas y modelos únicos
                 var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
@@ -107,6 +109,14 @@ namespace ConcesionariaApp.Controllers
         {
             try
             {
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                if (userIdClaim == null) return Unauthorized();
+
+                int usuarioId = int.Parse(userIdClaim.Value);
+
+                // Asignar el ID del usuario autenticado
+                vehiculo.UsuarioId = usuarioId;
+
                 await _vehiculoRepository.CreateVehiculoConFotosAsync(vehiculo, Imagenes);
 
                 TempData["SuccessMessage"] = "Vehículo creado correctamente.";

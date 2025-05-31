@@ -22,7 +22,7 @@ public class VehiculoRepository
     }
 
     public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(
-    int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
+    int idUsuario, int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
     {
         var query = GetQueryable();
 
@@ -31,6 +31,7 @@ public class VehiculoRepository
             .ThenInclude(m => m.Marca)
             .Include(v => v.Destacados);
 
+        query = query.Where(v => v.UsuarioId == idUsuario);
 
         if (idMarca.HasValue)
         {

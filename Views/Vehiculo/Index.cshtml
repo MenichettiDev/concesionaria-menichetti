@@ -163,7 +163,7 @@ else
                     @if (vehiculo.Destacado == 1)
                         {
                             <button type="button"
-                                    class="btn btn-outline-warning btn-sm"
+                                    class="btn btn-outline-secondary btn-sm"
                                     title="Ya está destacado"
                                     onclick="Swal.fire({
                                         icon: 'info',
@@ -171,15 +171,15 @@ else
                                         text: 'No es necesario destacarlo nuevamente.',
                                         confirmButtonText: 'OK'
                                     })">
-                                <i class="bi bi-star-fill text-warning"></i>
+                                <i class="bi bi-award-fill text-warning"></i>
                             </button>
                         }
                         else
                         {
-                            <a class="btn btn-outline-warning btn-sm"
+                            <a class="btn btn-outline-secondary btn-sm"
                             title="Destacar"
                             href="@Url.Action("Create", "Pagos", new { tipo = "Destacado", vehiculoId = vehiculo.Id, monto = 2000 })">
-                                <i class="bi bi-star"></i>
+                                <i class="bi bi-award"></i>
                             </a>
                         }
 

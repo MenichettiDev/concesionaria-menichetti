@@ -109,9 +109,13 @@ public class HomeRepository
             {
                 return (vehiculo, false);
             }
-            bool tieneAcceso = vehiculo.AccesosPagados.Any(a =>
-                a.UsuarioId == idUsuarioLogueado && a.Activo == 1);
 
+            // El usuario tiene acceso si:
+            // - Pagó por el acceso Y está activo
+            // - O es el propietario del vehículo
+            bool tieneAcceso = vehiculo.AccesosPagados.Any(a =>
+                                    a.UsuarioId == idUsuarioLogueado && a.Activo == 1)
+                                || vehiculo.UsuarioId == idUsuarioLogueado;
 
             return (vehiculo, tieneAcceso);
         }

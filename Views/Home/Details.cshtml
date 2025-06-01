@@ -6,6 +6,27 @@
     ViewData["Title"] = "Detalles del Vehículo";
 }
 
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '@TempData["SuccessMessage"]',
+            confirmButtonText: 'Cerrar',
+            customClass: {
+                popup: 'rounded shadow'
+            }
+        });
+    </script>
+}
+
+@if (ViewBag.ErrorMessage != null)
+{
+    <div class="alert alert-danger">@ViewBag.ErrorMessage</div>
+}
+
 <h1 class="mb-4"><i class="bi bi-info-circle-fill"></i> @ViewData["Title"]</h1>
 
 
@@ -71,7 +92,7 @@
         href="@Url.Action("Create", "Pagos", new 
         {   tipo = "Acceso",
             detalle = "Pago por detalles vehiculo: " , 
-            Id = Model.Id,
+            vehiculoId = Model.Id,
             monto =500 })">
         <i class="bi bi-person-lines-fill"></i> Conoce los datos del vendedor
     </a>
@@ -82,7 +103,7 @@ else if( !User.Identity.IsAuthenticated && ViewBag.TieneAcceso == false )
         href="@Url.Action("Login", "Usuario", new 
                 {   tipo = "Acceso",
                     detalle = "Pago por detalles vehiculo: " , 
-                    Id = Model.Id,
+                    vehiculoId = Model.Id,
                     monto =500 })">
         <i class="bi bi-person-lines-fill"></i> Registrate para conocer los datos del vendedor
     </a>

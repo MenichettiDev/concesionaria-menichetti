@@ -163,19 +163,36 @@
                     })
                         .then(async response => {
                             if (response.ok) {
-                                alert('Vehículo guardado exitosamente.');
-                                window.location.href = '/Vehiculo/Index';
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Vehículo guardado',
+                                    text: 'El vehículo se guardó exitosamente.',
+                                    confirmButtonText: 'Aceptar'
+                                }).then(() => {
+                                    window.location.href = '/Vehiculo/Index';
+                                });
                             } else {
                                 const text = await response.text();
                                 console.error('Respuesta del servidor:', text);
-                                alert('Error al guardar. Verificá los datos.');
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error al guardar',
+                                    text: 'Verificá los datos ingresados.',
+                                    confirmButtonText: 'Aceptar'
+                                });
                             }
                         })
                         .catch(err => {
                             console.error('Error en la solicitud:', err);
-                            alert('Error inesperado al enviar el formulario.');
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error inesperado',
+                                text: 'Ocurrió un error al enviar el formulario.',
+                                confirmButtonText: 'Aceptar'
+                            });
                         });
                 }
+
             }
         });
     </script>

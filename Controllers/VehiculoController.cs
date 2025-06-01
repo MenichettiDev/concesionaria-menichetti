@@ -10,13 +10,15 @@ namespace ConcesionariaApp.Controllers
     {
         private readonly VehiculoRepository _vehiculoRepository;
         private readonly UsuarioRepository _usuarioRepository;
+        private readonly SuscripcionesRepository _suscripcionesRepository;
         private readonly ILogger<VehiculoController> _logger;
 
-        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository, UsuarioRepository usuarioRepository)
+        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository, UsuarioRepository usuarioRepository, SuscripcionesRepository suscripcionesRepository)
         {
             _logger = logger;
             _vehiculoRepository = vehiculoRepository;
             _usuarioRepository = usuarioRepository;
+            _suscripcionesRepository = suscripcionesRepository;
         }
 
         public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado = 1, int page = 1)
@@ -48,6 +50,10 @@ namespace ConcesionariaApp.Controllers
                     descripcion = m.Descripcion,
                     idMarca = m.IdMarca
                 }).ToList();
+
+                //publicaciones restantes
+                ViewBag.PublicacionesRestantes = await _suscripcionesRepository.ObtenerPublicacionesRestantesAsync(idUser);
+
 
                 ViewBag.PaginaActual = page;
                 ViewBag.TotalPaginas = result.TotalPaginas;
@@ -120,6 +126,13 @@ namespace ConcesionariaApp.Controllers
 
                 // Asignar el ID del usuario autenticado
                 vehiculo.UsuarioId = usuarioId;
+
+                //Controlamos las suscripciones y disponibles
+                if (!await _suscripcionesRepository.UsuarioPuedePublicarAsync(usuarioId))
+                {
+                    return BadRequest("Ya alcanzaste el límite de publicaciones según tu suscripción.");
+                }
+
 
                 await _vehiculoRepository.CreateVehiculoConFotosAsync(vehiculo, Imagenes);
 

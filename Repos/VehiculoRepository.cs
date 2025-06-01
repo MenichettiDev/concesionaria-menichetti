@@ -21,8 +21,7 @@ public class VehiculoRepository
         return _context.Vehiculos.AsQueryable();
     }
 
-    public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(
-    int idUsuario, int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
+    public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(int idUsuario, int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado, int page, int pageSize)
     {
         var query = GetQueryable();
 

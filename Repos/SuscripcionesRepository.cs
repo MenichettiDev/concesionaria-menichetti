@@ -132,4 +132,63 @@ public class SuscripcionesRepository : GenericRepository<Suscripcione>
     {
         return _context.Suscripciones.AsQueryable();
     }
+
+    public async Task<bool> UsuarioPuedePublicarAsync(int usuarioId)
+    {
+        try
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.ContratosSuscripcions.Where(cs => cs.Activo == true))
+                    .ThenInclude(cs => cs.Suscripcion)
+                .Include(u => u.Vehiculos)
+                .FirstOrDefaultAsync(u => u.Id == usuarioId);
+
+            if (usuario == null)
+                return false;
+
+            var contratosActivos = usuario.ContratosSuscripcions;
+            if (contratosActivos == null || !contratosActivos.Any())
+                return false;
+
+            int publicacionesPermitidas = contratosActivos.Sum(c => c.Suscripcion.CantidadPublicaciones);
+            int publicacionesActuales = usuario.Vehiculos.Count();
+
+            return publicacionesActuales < publicacionesPermitidas;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al verificar publicaciones disponibles para el usuario {usuarioId}: {ex.Message}");
+            return false;
+        }
+
+
+
+    }
+    public async Task<int> ObtenerPublicacionesRestantesAsync(int usuarioId)
+    {
+        try
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.ContratosSuscripcions.Where(cs => cs.Activo == true))
+                    .ThenInclude(cs => cs.Suscripcion)
+                .Include(u => u.Vehiculos)
+                .FirstOrDefaultAsync(u => u.Id == usuarioId);
+
+            if (usuario == null)
+                return 0;
+
+            int publicacionesPermitidas = usuario.ContratosSuscripcions.Sum(c => c.Suscripcion.CantidadPublicaciones);
+            int publicacionesActuales = usuario.Vehiculos.Count();
+
+            return Math.Max(publicacionesPermitidas - publicacionesActuales, 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al calcular publicaciones restantes para el usuario {usuarioId}: {ex.Message}");
+            return 0;
+        }
+    }
+
+
+
 }

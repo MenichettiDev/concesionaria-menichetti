@@ -29,9 +29,9 @@ namespace concesionaria_menichetti.Controllers
             _accesosRepository = accesosRepository;
         }
 
-        // GET Create
+        // GET Create, el id puede ser de suscripcion, vehiculo o plan
         [HttpGet]
-        public IActionResult Create(string tipo, int? vehiculoId, decimal? monto)
+        public IActionResult Create(string tipo, int? id, decimal? monto)
         {
             if (string.IsNullOrEmpty(tipo) || monto == null)
             {
@@ -41,10 +41,10 @@ namespace concesionaria_menichetti.Controllers
 
             var detalle = tipo switch
             {
-                "Destacado" => $"Destacar vehículo ID {vehiculoId}",
-                "Suscripcion" => "Pago de suscripción",
-                "Plan" => "Contratación de plan",
-                "Acceso" => $"Informacion vehiculo {vehiculoId}",
+                "Destacado" => $"Destacar vehículo ID {id}",
+                "Suscripcion" => $"Pago de suscripción ID {id}",
+                "Plan" => $"Contratación de plan ID {id}",
+                "Acceso" => $"Informacion vehiculo {id}",
                 _ => "Pago genérico"
             };
 
@@ -55,7 +55,7 @@ namespace concesionaria_menichetti.Controllers
                 Detalle = detalle
             };
 
-            ViewBag.vehiculoId = vehiculoId;
+            ViewBag.Id = id;
 
 
             return View(model);

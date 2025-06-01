@@ -77,4 +77,6 @@ public class ContratoPlanesRepository : GenericRepository<ContratosPlane>
     {
         return _context.ContratosPlanes.AsQueryable();
     }
+
+
 }

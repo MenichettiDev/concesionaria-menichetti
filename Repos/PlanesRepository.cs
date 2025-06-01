@@ -132,4 +132,127 @@ public class PlanesConcesionariaRepository : GenericRepository<PlanesConcesionar
     {
         return _context.PlanesConcesionaria.AsQueryable();
     }
+
+
+    public async Task<bool> UsuarioPuedePublicarAsync(int usuarioId)
+    {
+        try
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.ContratosSuscripcions.Where(cs => cs.Activo == true))
+                    .ThenInclude(cs => cs.Suscripcion)
+                .Include(u => u.Vehiculos)
+                .FirstOrDefaultAsync(u => u.Id == usuarioId);
+
+            if (usuario == null)
+                return false;
+
+            var contratosActivos = usuario.ContratosSuscripcions;
+            if (contratosActivos == null || !contratosActivos.Any())
+                return false;
+
+            int publicacionesPermitidas = contratosActivos.Sum(c => c.Suscripcion.CantidadPublicaciones);
+            int publicacionesActuales = usuario.Vehiculos.Count();
+
+            return publicacionesActuales < publicacionesPermitidas;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al verificar publicaciones disponibles para el usuario {usuarioId}: {ex.Message}");
+            return false;
+        }
+
+
+
+    }
+    public async Task<int> ObtenerPublicacionesRestantesAsync(int usuarioId)
+    {
+        try
+        {
+            var usuario = await _context.Usuarios
+                .Include(u => u.ContratosSuscripcions.Where(cs => cs.Activo == true))
+                    .ThenInclude(cs => cs.Suscripcion)
+                .Include(u => u.Vehiculos)
+                .FirstOrDefaultAsync(u => u.Id == usuarioId);
+
+            if (usuario == null)
+                return 0;
+
+            int publicacionesPermitidas = usuario.ContratosSuscripcions.Sum(c => c.Suscripcion.CantidadPublicaciones);
+            int publicacionesActuales = usuario.Vehiculos.Count();
+
+            return Math.Max(publicacionesPermitidas - publicacionesActuales, 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al calcular publicaciones restantes para el usuario {usuarioId}: {ex.Message}");
+            return 0;
+        }
+    }
+
+
+    public async Task<bool> ConcesionariaPuedePublicarAsync(int concesionariaId)
+    {
+        try
+        {
+            var concesionaria = await _context.Concesionarias
+                .Include(c => c.ContratosPlanes.Where(cp => cp.Activo == true))
+                    .ThenInclude(cp => cp.Plan)
+                .Include(c => c.Usuario)
+                    .ThenInclude(u => u.Vehiculos)
+                .FirstOrDefaultAsync(c => c.Id == concesionariaId);
+
+            if (concesionaria == null || concesionaria.Usuario == null)
+                return false;
+
+            var contratosActivos = concesionaria.ContratosPlanes;
+            if (contratosActivos == null || !contratosActivos.Any())
+                return false;
+
+            int publicacionesPermitidas = contratosActivos
+                .Where(c => c.Plan != null)
+                .Sum(c => c.Plan.CantidadPublicaciones ?? 0);
+
+            int publicacionesActuales = concesionaria.Usuario.Vehiculos?.Count ?? 0;
+
+            return publicacionesActuales < publicacionesPermitidas;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al verificar publicaciones disponibles para la concesionaria {concesionariaId}: {ex.Message}");
+            return false;
+        }
+    }
+
+
+    public async Task<int> ObtenerPublicacionesRestantesConcesionariaAsync(int concesionariaId)
+    {
+        try
+        {
+            var concesionaria = await _context.Concesionarias
+                .Include(c => c.ContratosPlanes.Where(cp => cp.Activo == true))
+                    .ThenInclude(cp => cp.Plan)
+                .Include(c => c.Usuario)
+                    .ThenInclude(u => u.Vehiculos)
+                .FirstOrDefaultAsync(c => c.Id == concesionariaId);
+
+            if (concesionaria == null || concesionaria.Usuario == null)
+                return 0;
+
+            int publicacionesPermitidas = concesionaria.ContratosPlanes
+                .Where(cp => cp.Plan != null)
+                .Sum(cp => cp.Plan.CantidadPublicaciones ?? 0);
+
+            int publicacionesActuales = concesionaria.Usuario.Vehiculos?.Count ?? 0;
+
+            return Math.Max(publicacionesPermitidas - publicacionesActuales, 0);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error al calcular publicaciones restantes para la concesionaria {concesionariaId}: {ex.Message}");
+            return 0;
+        }
+    }
+
+
 }

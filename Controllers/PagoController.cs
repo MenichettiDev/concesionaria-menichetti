@@ -86,9 +86,10 @@ namespace concesionaria_menichetti.Controllers
 
                 await _pagosRepository.CreatePagoAsync(pago);
 
+                // Console.WriteLine("vehiculoId: " + Id);
+                // Console.WriteLine("tipo: " + model.Tipo);
                 if (model.Tipo == "Destacado")
                 {
-                    // Console.WriteLine("vehiculoId: " + Id);
                     var VehiculoId = Id.Value;
 
                     await _destacadosRepository.MarcarVehiculoComoDestacadoAsync(VehiculoId);
@@ -111,7 +112,7 @@ namespace concesionaria_menichetti.Controllers
                     var Concesionaria = await _concesionariaRepository.ObtenerPorUsuarioIdAsync(idUser);
 
                     await _contratoPlanesRepository.CargarContratoPlan(idPlan, Concesionaria.Id);
-                    TempData["SuccessMessage"] = "Pago de plan registrado correctamente.";
+                    TempData["SuccessMessage"] = "Pago de plan para concesionaria registrado correctamente.";
                 }
                 else if (model.Tipo == "Acceso")
                 {

@@ -11,14 +11,19 @@ namespace ConcesionariaApp.Controllers
         private readonly VehiculoRepository _vehiculoRepository;
         private readonly UsuarioRepository _usuarioRepository;
         private readonly SuscripcionesRepository _suscripcionesRepository;
+        private readonly PlanesConcesionariaRepository _planesRepository;
+        private readonly ConcesionariaRepository _concesionariaRepository;
         private readonly ILogger<VehiculoController> _logger;
 
-        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository, UsuarioRepository usuarioRepository, SuscripcionesRepository suscripcionesRepository)
+        public VehiculoController(ILogger<VehiculoController> logger, VehiculoRepository vehiculoRepository, UsuarioRepository usuarioRepository, SuscripcionesRepository suscripcionesRepository, PlanesConcesionariaRepository contratoPlanesRepository, ConcesionariaRepository concesionariaRepository)
         {
             _logger = logger;
             _vehiculoRepository = vehiculoRepository;
             _usuarioRepository = usuarioRepository;
             _suscripcionesRepository = suscripcionesRepository;
+            _planesRepository = contratoPlanesRepository;
+            _concesionariaRepository = concesionariaRepository;
+
         }
 
         public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado = 1, int page = 1)
@@ -27,6 +32,8 @@ namespace ConcesionariaApp.Controllers
             {
                 int pageSize = 10;
                 int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                var usuario = await _usuarioRepository.GetUsuarioByIdAsync(idUser); // o similar
+
 
                 var result = await _vehiculoRepository.ObtenerVehiculosFiltradosAsync(idUser, idMarca, idModelo, anoDesde, anoHasta, estado, page, pageSize);
 
@@ -34,7 +41,6 @@ namespace ConcesionariaApp.Controllers
                 var marcas = await _vehiculoRepository.GetMarcasAsync(); // Método para obtener las marcas
                 var modelos = await _vehiculoRepository.GetModelosAsync(); // Método para obtener los modelos
 
-                var usuario = await _usuarioRepository.GetUsuarioByIdAsync(idUser); // o similar
                 ViewBag.EsConcesionaria = usuario?.EsConcesionaria ?? false;
 
                 //pasamos la data a la vista
@@ -52,7 +58,17 @@ namespace ConcesionariaApp.Controllers
                 }).ToList();
 
                 //publicaciones restantes
-                ViewBag.PublicacionesRestantes = await _suscripcionesRepository.ObtenerPublicacionesRestantesAsync(idUser);
+                if (usuario?.EsConcesionaria == true)
+                {
+                    var concesionaria = await _concesionariaRepository.ObtenerPorUsuarioIdAsync(idUser); // o similar
+                    Console.WriteLine($"idConcesionaria: {concesionaria?.Id}");
+                    ViewBag.PublicacionesRestantes = await _planesRepository.ObtenerPublicacionesRestantesConcesionariaAsync(concesionaria.Id);
+                }
+                else
+                {
+
+                    ViewBag.PublicacionesRestantes = await _suscripcionesRepository.ObtenerPublicacionesRestantesAsync(idUser);
+                }
 
 
                 ViewBag.PaginaActual = page;
@@ -120,6 +136,10 @@ namespace ConcesionariaApp.Controllers
             try
             {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+                int idUser = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+                var usuario = await _usuarioRepository.GetUsuarioByIdAsync(idUser); // o similar
+                var concesionaria = await _concesionariaRepository.ObtenerPorUsuarioIdAsync(idUser); // o similar
+
                 if (userIdClaim == null) return Unauthorized();
 
                 int usuarioId = int.Parse(userIdClaim.Value);
@@ -128,9 +148,21 @@ namespace ConcesionariaApp.Controllers
                 vehiculo.UsuarioId = usuarioId;
 
                 //Controlamos las suscripciones y disponibles
-                if (!await _suscripcionesRepository.UsuarioPuedePublicarAsync(usuarioId))
+                if (usuario?.EsConcesionaria == true)
                 {
-                    return BadRequest("Ya alcanzaste el límite de publicaciones según tu suscripción.");
+
+                    if (!await _planesRepository.ConcesionariaPuedePublicarAsync(concesionaria.Id))
+                    {
+                        return BadRequest("Ya alcanzaste el límite de publicaciones según tu plan.");
+                    }
+                }
+                else
+                {
+
+                    if (!await _suscripcionesRepository.UsuarioPuedePublicarAsync(usuarioId))
+                    {
+                        return BadRequest("Ya alcanzaste el límite de publicaciones según tu suscripción.");
+                    }
                 }
 
 

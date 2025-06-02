@@ -3,6 +3,7 @@ using concesionaria_menichetti.Models;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.IdentityModel.Tokens;
 using concesionaria_menichetti.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 var configuration = builder.Configuration;
@@ -19,53 +20,53 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.LogoutPath = "/Usuario/Logout";
         options.AccessDeniedPath = "/Home/Restringido";
         //options.ExpireTimeSpan = TimeSpan.FromMinutes(5);//Tiempo de expiración
-    });
-// .AddJwtBearer(options =>//la api web valida con token
-// {
-//     options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-//     {
-//         ValidateIssuer = true,
-//         ValidateAudience = true,
-//         ValidateLifetime = true,
-//         ValidateIssuerSigningKey = true,
-//         ValidIssuer = configuration["TokenAuthentication:Issuer"],
-//         ValidAudience = configuration["TokenAuthentication:Audience"],
-//         IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(
-//             configuration["TokenAuthentication:SecretKey"])),
-//     };
-//     // opción extra para usar el token en el hub y otras peticiones sin encabezado (enlaces, src de img, etc.)
-//     // options.Events = new JwtBearerEvents
-//     // {
-//     //     OnMessageReceived = context =>
-//     //     {
-//     //         // Leer el token desde el query string
-//     //         var accessToken = context.Request.Query["access_token"];
-//     //         // Si el request es para el Hub u otra ruta seleccionada...
-//     //         var path = context.HttpContext.Request.Path;
-//     //         if (!string.IsNullOrEmpty(accessToken) &&
-//     //             (path.StartsWithSegments("/chatsegurohub") ||
-//     //             path.StartsWithSegments("/api/propietarios/reset") ||
-//     //             path.StartsWithSegments("/api/propietarios/token")))
-//     //         {//reemplazar las urls por las necesarias ruta ⬆
-//     //             context.Token = accessToken;
-//     //         }
-//     //         return Task.CompletedTask;
-//     //     },
-//     //     OnTokenValidated = context =>
-//     //     {
-//     //         // Este evento se activa cuando el token es validado correctamente
-//     //         Console.WriteLine("Token válido para el usuario: " + context?.Principal?.Identity?.Name);
-//     //         // Aquí puedes realizar otras validaciones o acciones si es necesario
-//     //         return Task.CompletedTask;
-//     //     },
-//     //     OnAuthenticationFailed = context =>
-//     //     {
-//     //         // Este evento se activa cuando la autenticación falla
-//     //         Console.WriteLine("Error en la autenticación del token: " + context.Exception.Message);
-//     //         return Task.CompletedTask;
-//     //     }
-//     // };
-// });
+    })
+.AddJwtBearer(options =>//la api web valida con token
+{
+    options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = configuration["TokenAuthentication:Issuer"],
+        ValidAudience = configuration["TokenAuthentication:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(System.Text.Encoding.ASCII.GetBytes(
+            configuration["TokenAuthentication:SecretKey"])),
+    };
+    // opción extra para usar el token en el hub y otras peticiones sin encabezado (enlaces, src de img, etc.)
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Leer el token desde el query string
+            var accessToken = context.Request.Query["access_token"];
+            // Si el request es para el Hub u otra ruta seleccionada...
+            // var path = context.HttpContext.Request.Path;
+            // if (!string.IsNullOrEmpty(accessToken) &&
+            //     (path.StartsWithSegments("/chatsegurohub") ||
+            //     path.StartsWithSegments("/api/propietarios/reset") ||
+            //     path.StartsWithSegments("/api/propietarios/token")))
+            {//reemplazar las urls por las necesarias ruta ⬆
+                context.Token = accessToken;
+            }
+            return Task.CompletedTask;
+        },
+        OnTokenValidated = context =>
+        {
+            // Este evento se activa cuando el token es validado correctamente
+            Console.WriteLine("Token válido para el usuario: " + context?.Principal?.Identity?.Name);
+            // Aquí puedes realizar otras validaciones o acciones si es necesario
+            return Task.CompletedTask;
+        },
+        OnAuthenticationFailed = context =>
+        {
+            // Este evento se activa cuando la autenticación falla
+            Console.WriteLine("Error en la autenticación del token: " + context.Exception.Message);
+            return Task.CompletedTask;
+        }
+    };
+});
 
 builder.Services.AddAuthorization(options =>
 {

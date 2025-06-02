@@ -61,30 +61,19 @@
 <div class="card shadow rounded p-4 mb-4 mt-3 bg-light">
     <div class="row g-4">
         <div class="col-md-6">
-            <h5><strong>Marca:</strong> @Model.Modelo?.Marca?.Descripcion </h5>
-            <h5><strong>Modelo:</strong> @Model.Modelo?.Descripcion </h5>
-            <p><strong>Año:</strong> @Model.Anio</p>
-            <p><strong>Precio:</strong> $@Model?.Precio</p>
-            <p><strong>Kilometraje:</strong> @Model?.Kilometraje</p>
+            <h5 class="mb-3"><strong>Marca:</strong> <span class="text-muted">@Model.Modelo?.Marca?.Descripcion</span></h5>
+            <h5 class="mb-3"><strong>Modelo:</strong> <span class="text-muted">@Model.Modelo?.Descripcion</span></h5>
+            <p class="mb-2"><strong>Año:</strong> <span class="text-muted">@Model.Anio</span></p>
+            <p class="mb-2"><strong>Kilometraje:</strong> <span class="text-muted">@Model?.Kilometraje km</span></p>
         </div>
 
         <div class="col-md-6">
-            <p><strong>Combustible:</strong> @Model?.Combustible</p>
-            <p>
-                <strong>Publicación destacada:</strong>
-                @* <span class="badge @(Model?.Destacado == true ? "bg-warning text-dark" : "bg-secondary")">
-                    @(Model?.Destacado == true ? "Destacada" : "No destacada")
-                </span> *@
-            </p>
-            <p>
-                <strong>Estado publicación:</strong>
-                <span class="badge @(Model?.Estado == 1 ? "bg-success" : "bg-danger")">
-                    @(Model?.Estado == 1 ? "Activo" : "Inactivo")
-                </span>
-            </p>
+            <h5 class="mb-3"><strong>Precio:</strong> <span class="text-success">$@Model?.Precio</span></h5>
+            <p class="mb-2"><strong>Combustible:</strong> <span class="text-muted">@Model?.Combustible</span></p>
         </div>
     </div>
 </div>
+
 
 @if (User.Identity.IsAuthenticated && ViewBag.TieneAcceso == false)
 {

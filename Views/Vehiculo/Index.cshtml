@@ -29,9 +29,10 @@
 <h1 class="mb-4"><i class="bi bi-car-front"></i> Mis Vehículos</h1>
 
 <p>
-    <a asp-action="Create" class="btn btn-success">
+    <button id="btnCargarVehiculo" class="btn btn-success">
         <i class="bi bi-plus-circle-fill"></i> Cargar Nuevo Vehículo
-    </a>
+    </button>
+
 
     @if (ViewBag.EsConcesionaria)
     {
@@ -405,6 +406,35 @@ else
             });
         });
     }
+
+
+    document.getElementById("btnCargarVehiculo").addEventListener("click", function () {
+        const publicacionesRestantes = @ViewBag.PublicacionesRestantes ?? 0;
+        const esConcesionaria = @((ViewBag.EsConcesionaria ?? false).ToString().ToLower());
+
+        if (publicacionesRestantes <= 0) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Sin publicaciones disponibles',
+                text: 'Debes contratar un plan para poder cargar nuevos vehículos.',
+                showCancelButton: true,
+                confirmButtonText: 'Contratar ahora',
+                cancelButtonText: 'Cancelar',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    if (esConcesionaria) {
+                        window.location.href = '@Url.Action("Contratar", "PlanesConcesionaria")';
+                    } else {
+                        window.location.href = '@Url.Action("Contratar", "Suscripciones")';
+                    }
+                }
+            });
+        } else {
+            window.location.href = '@Url.Action("Create", "Vehiculo")';
+        }
+    });
+
 
 
     </script>

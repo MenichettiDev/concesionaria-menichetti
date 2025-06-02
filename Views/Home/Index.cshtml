@@ -92,6 +92,16 @@
             <input v-model="precioHasta" type="number" class="form-control" placeholder="Ej: 5000000" min="0">
         </div>
 
+        <!-- Filtro Tipo de Vendedor -->
+        <div class="col-md-3">
+            <label class="form-label">Tipo de vendedor</label>
+            <select v-model="esConcesionaria" class="form-select">
+                <option value="">Todos</option>
+                <option value="true">Concesionaria</option>
+                <option value="false">Particular</option>
+            </select>
+        </div>
+
 
         <!-- Botones de Filtrar y Limpiar -->
         <div class="col-md-3 d-flex align-items-end gap-2">
@@ -242,6 +252,7 @@ else
                 estado: '@Context.Request.Query["estado"]',
                 precioDesde: '@Context.Request.Query["precioDesde"]',
                 precioHasta: '@Context.Request.Query["precioHasta"]',
+                esConcesionaria: '@Context.Request.Query["esConcesionaria"]',
 
                 modelos: @Html.Raw(JsonSerializer.Serialize(ViewBag.Modelos)),  // Usando ViewBag.Modelos
                 marcas: @Html.Raw(JsonSerializer.Serialize(ViewBag.Marcas)),  
@@ -265,6 +276,9 @@ else
                     if (this.modelo) params.append("modelo", this.modelo);
                     if (this.precioDesde) params.append("precioDesde", this.precioDesde);
                     if (this.precioHasta) params.append("precioHasta", this.precioHasta);
+                    if (this.esConcesionaria !== "") params.append("esConcesionaria", this.esConcesionaria);
+
+
 
                     window.location.href = "/Home/Index?" + params.toString();
                 },
@@ -274,6 +288,8 @@ else
                     this.estado = '';
                     this.precioDesde = '';
                     this.precioHasta = '';
+                    this.esConcesionaria = '';
+
 
                     this.ano = '';
                     window.location.href = "/Home/Index";

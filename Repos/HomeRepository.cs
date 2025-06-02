@@ -25,7 +25,7 @@ public class HomeRepository
     }
 
     public async Task<(List<Vehiculo> Vehiculos, int TotalPaginas)> ObtenerVehiculosFiltradosAsync(
-    int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, decimal? precioDesde, decimal? precioHasta, int? estado, int page, int pageSize)
+    int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, decimal? precioDesde, decimal? precioHasta, int? estado, bool? esConcesionaria, int page, int pageSize)
     {
         var query = GetQueryable();
 
@@ -70,6 +70,11 @@ public class HomeRepository
         {
             query = query.Where(v => v.Precio <= precioHasta);
         }
+
+        if (esConcesionaria.HasValue)
+            query = query.Where(v => v.Usuario.EsConcesionaria == esConcesionaria.Value);
+
+
 
         var totalVehiculos = await query.CountAsync();
 

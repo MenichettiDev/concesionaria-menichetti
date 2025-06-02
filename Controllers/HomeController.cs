@@ -42,8 +42,8 @@ public class HomeController : Controller
     int? anoHasta,
     decimal? precioDesde,
     decimal? precioHasta,
-    // string? propietario,
     int? estado = 1,
+    bool? esConcesionaria = null,
     int page = 1)
 
     {
@@ -52,7 +52,7 @@ public class HomeController : Controller
             int pageSize = 10;
 
             var result = await _homeRepository.ObtenerVehiculosFiltradosAsync(
-            idMarca, idModelo, anoDesde, anoHasta, precioDesde, precioHasta, estado, page, pageSize);
+            idMarca, idModelo, anoDesde, anoHasta, precioDesde, precioHasta, estado, esConcesionaria, page, pageSize);
             //  precioDesde, precioHasta, propietario,
 
             // Obtenemos las marcas y modelos únicos

@@ -24,6 +24,7 @@ namespace ConcesionariaApp.Controllers
             _concesionariaRepository = concesionariaRepository;
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string? nombre, bool? esConcesionaria, bool? activo, int page = 1)
         {
             try
@@ -53,7 +54,7 @@ namespace ConcesionariaApp.Controllers
         }
 
 
-
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -77,15 +78,11 @@ namespace ConcesionariaApp.Controllers
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Create(Usuario usuario)
         {
             try
             {
-                // Validar el modelo
-                // if (!ModelState.IsValid)
-                // {
-                //     return View(usuario);
-                // }
 
                 // Validar que la contraseña no sea nula o vacía
                 if (string.IsNullOrWhiteSpace(usuario.Contraseña))
@@ -128,12 +125,14 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
+        [AllowAnonymous] //registro sin autenticación
         public IActionResult Registro()
         {
             return View();
         }
 
         [HttpPost]
+        [AllowAnonymous]
         public async Task<IActionResult> Registro(IFormCollection form)
         {
             try
@@ -207,8 +206,8 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        [HttpPost]
         [Authorize]
+        [HttpPost]
         public async Task<IActionResult> Edit(Usuario usuario, string PasswordActual, string NuevaPassword, string ConfirmarPassword)
         {
             try
@@ -219,7 +218,7 @@ namespace ConcesionariaApp.Controllers
 
                 int userIdActual = int.Parse(idClaim.Value);
 
-                bool esAdmin = User.IsInRole("Administrador");
+                bool esAdmin = User.IsInRole("Admin");
                 if (userIdActual != usuario.Id && !esAdmin)
                 {
                     return Forbid();
@@ -234,10 +233,18 @@ namespace ConcesionariaApp.Controllers
                 }
 
                 usuarioExistente.Email = usuario.Email;
+                usuarioExistente.Nombre = usuario.Nombre;
+                usuarioExistente.Email = usuario.Email;
+                usuarioExistente.Telefono = usuario.Telefono;
+                usuarioExistente.Ubicacion = usuario.Ubicacion;
+                usuarioExistente.EsConcesionaria = usuario.EsConcesionaria;
+
 
                 if (esAdmin)
                 {
                     usuarioExistente.Rol = usuario.Rol;
+                    usuarioExistente.Verificado = usuario.Verificado;
+                    usuarioExistente.Activo = usuario.Activo;
                 }
 
                 if (!string.IsNullOrEmpty(PasswordActual) ||
@@ -285,7 +292,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -304,6 +311,7 @@ namespace ConcesionariaApp.Controllers
         }
 
         [HttpPost, ActionName("DeleteConfirmed")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             try
@@ -383,7 +391,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-
+        [Authorize]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);

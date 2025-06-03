@@ -99,6 +99,7 @@ public class UsuarioRepository
             usuarioExistente.Activo = usuario.Activo;
             usuarioExistente.Telefono = usuario.Telefono;
             usuarioExistente.Ubicacion = usuario.Ubicacion;
+            usuarioExistente.Rol = usuario.Rol;
 
             await _context.SaveChangesAsync();
         }

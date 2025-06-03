@@ -1,10 +1,12 @@
 using concesionaria_menichetti.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
 namespace concesionaria_menichetti.Controllers
 {
+    [Authorize]
     public class FavoritosController : Controller
     {
         private readonly FavoritoRepository _favoritoRepository;

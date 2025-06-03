@@ -1,4 +1,5 @@
 using concesionaria_menichetti.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Linq;
@@ -6,16 +7,18 @@ using System.Threading.Tasks;
 
 namespace ConcesionariaApp.Controllers
 {
+
     public class PlanesConcesionariaController : Controller
     {
         private readonly PlanesConcesionariaRepository _planesRepository;
+
 
         public PlanesConcesionariaController(PlanesConcesionariaRepository planesRepository)
         {
             _planesRepository = planesRepository;
         }
 
-        // INDEX
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Index(string nombre, int page = 1)
         {
             try
@@ -36,7 +39,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // DETAILS
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -54,13 +57,13 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // CREATE (GET)
+        [Authorize(Roles = "Admin")]
         public IActionResult Create()
         {
             return View();
         }
 
-        // CREATE (POST)
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(PlanesConcesionarium plan)
         {
@@ -83,7 +86,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // EDIT (GET)
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -101,7 +104,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // EDIT (POST)
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Edit(int id, PlanesConcesionarium plan)
         {
@@ -126,7 +129,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // DELETE (GET)
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -144,7 +147,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
-        // DELETE (POST)
+        [Authorize(Roles = "Admin")]
         [HttpPost, ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
@@ -161,6 +164,8 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
+
+        [Authorize]
         public async Task<IActionResult> Contratar(string nombre, int page = 1)
         {
             try

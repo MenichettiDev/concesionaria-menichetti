@@ -3,6 +3,7 @@ using concesionaria_menichetti.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ConcesionariaApp.Controllers;
 
@@ -16,7 +17,7 @@ public class FotosVehiculoController : Controller
         _fotosVehiculoRepository = repo;
         _env = env;
     }
-
+    [AllowAnonymous]
     public async Task<IActionResult> PorVehiculo(int id)
     {
         var fotos = await _fotosVehiculoRepository.BuscarPorVehiculoAsync(id);
@@ -24,6 +25,7 @@ public class FotosVehiculoController : Controller
         return View(fotos);
     }
 
+    [Authorize]
     public IActionResult Subir(int id)
     {
         ViewBag.VehiculoId = id;
@@ -31,6 +33,7 @@ public class FotosVehiculoController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> Subir(int id, List<IFormFile> imagenes)
     {
         try
@@ -77,6 +80,7 @@ public class FotosVehiculoController : Controller
     }
 
 
+    [Authorize]
     public async Task<IActionResult> Eliminar(int id)
     {
         var foto = await _fotosVehiculoRepository.ObtenerPorIdAsync(id);
@@ -87,6 +91,7 @@ public class FotosVehiculoController : Controller
     }
 
     [HttpPost, ActionName("Eliminar")]
+    [Authorize]
     public async Task<IActionResult> EliminarConfirmado(int id)
     {
         try

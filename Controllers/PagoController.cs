@@ -1,4 +1,5 @@
 using concesionaria_menichetti.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
@@ -31,6 +32,7 @@ namespace concesionaria_menichetti.Controllers
 
         // GET Create, el id puede ser de suscripcion, vehiculo o plan
         [HttpGet]
+        [Authorize]
         public IActionResult Create(string tipo, int? id, decimal? monto)
         {
             if (string.IsNullOrEmpty(tipo) || monto == null)
@@ -63,6 +65,7 @@ namespace concesionaria_menichetti.Controllers
 
         // POST Create //en id llega el id de suscripcion, de vehiculo o de plan 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create(Pago model, int? Id)
         {
             //obtengo id de usuario

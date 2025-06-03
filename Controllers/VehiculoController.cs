@@ -1,4 +1,5 @@
 using concesionaria_menichetti.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Security.Claims;
@@ -25,7 +26,7 @@ namespace ConcesionariaApp.Controllers
             _concesionariaRepository = concesionariaRepository;
 
         }
-
+        [Authorize]
         public async Task<IActionResult> Index(int? idMarca, int? idModelo, int? anoDesde, int? anoHasta, int? estado = 1, int page = 1)
         {
             try
@@ -86,6 +87,7 @@ namespace ConcesionariaApp.Controllers
         }
 
 
+        [Authorize]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null) return NotFound();
@@ -103,6 +105,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
+        [Authorize]
         public async Task<IActionResult> Create()
         {
 
@@ -131,6 +134,7 @@ namespace ConcesionariaApp.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromForm] Vehiculo vehiculo, List<IFormFile> Imagenes)
         {
             try
@@ -179,7 +183,7 @@ namespace ConcesionariaApp.Controllers
         }
 
 
-
+        [Authorize]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
@@ -207,6 +211,7 @@ namespace ConcesionariaApp.Controllers
 
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Edit(int id, [FromForm] Vehiculo vehiculo, List<IFormFile>? Imagenes, [FromForm] List<int>? FotosAEliminar)
         {
 
@@ -239,6 +244,7 @@ namespace ConcesionariaApp.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Destacar(int id)
         {
             var vehiculo = await _vehiculoRepository.GetVehiculoByIdAsync(id);
@@ -260,7 +266,7 @@ namespace ConcesionariaApp.Controllers
         }
 
 
-
+        [Authorize]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null) return NotFound();
@@ -278,6 +284,7 @@ namespace ConcesionariaApp.Controllers
             }
         }
 
+        [Authorize]
         [HttpPost, ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {

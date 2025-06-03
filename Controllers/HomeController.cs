@@ -34,17 +34,17 @@ public class HomeController : Controller
         _usuarioRepository = usuarioRepository;
         _favoritoRepository = favoritoRepository;
     }
-
+    [AllowAnonymous]
     public async Task<IActionResult> Index(
-    int? idMarca,
-    int? idModelo,
-    int? anoDesde,
-    int? anoHasta,
-    decimal? precioDesde,
-    decimal? precioHasta,
-    int? estado = 1,
-    bool? esConcesionaria = null,
-    int page = 1)
+        int? idMarca,
+        int? idModelo,
+        int? anoDesde,
+        int? anoHasta,
+        decimal? precioDesde,
+        decimal? precioHasta,
+        int? estado = 1,
+        bool? esConcesionaria = null,
+        int page = 1)
 
     {
         try
@@ -103,6 +103,7 @@ public class HomeController : Controller
         }
     }
 
+    [AllowAnonymous]
     public async Task<IActionResult> Details(int id)
     {
         // if (id == null) return NotFound();
@@ -141,6 +142,7 @@ public class HomeController : Controller
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
+    [AllowAnonymous]
     public IActionResult Error()
     {
         return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
@@ -148,6 +150,7 @@ public class HomeController : Controller
     ///
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> MarcarFavorito(int vehiculoId)
     {
         int usuarioId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
@@ -156,6 +159,7 @@ public class HomeController : Controller
     }
 
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> QuitarFavorito(int vehiculoId)
     {
         int usuarioId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
@@ -164,7 +168,11 @@ public class HomeController : Controller
     }
 
 
-
+    [AllowAnonymous]
+    public IActionResult Restringido()
+    {
+        return View();
+    }
 
 
 }
